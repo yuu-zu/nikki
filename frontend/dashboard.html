@@ -21,6 +21,7 @@
 
           <div class="sidebar-group">
             <button class="side-btn active" data-screen="dashboard-home">Trang ch&#7911;</button>
+            <button class="side-btn" data-screen="calendar">L&#7883;ch</button>
             <button class="side-btn" data-screen="notes">Nh&#7853;t k&#253;</button>
             <button class="side-btn" data-screen="shared-notes">Nh&#7853;t k&#253; &#273;&#432;&#7907;c chia s&#7867;</button>
             <button class="side-btn" data-screen="trash">Th&#249;ng r&#225;c</button>
@@ -169,6 +170,7 @@
                   <p>Ghi ng&#7855;n cho nh&#7919;ng ng&#224;y quan tr&#7885;ng.</p>
                 </div>
                 <div class="calendar-nav">
+                  <button id="calendar-select-month" class="secondary-btn" type="button">Chọn tháng</button>
                   <button id="calendar-prev" class="secondary-btn" type="button">&#8249;</button>
                   <button id="calendar-next" class="secondary-btn" type="button">&#8250;</button>
                 </div>
@@ -310,6 +312,7 @@
           <button id="clear-format" type="button" title="X&#243;a &#273;&#7889;nh d&#7841;ng">X&#243;a</button>
           <button id="download-word" class="secondary-btn" type="button">T&#7843;i Word</button>
         </div>
+        <div class="field"><label>Ti&#234;u &#273;&#7873;</label><input id="note-title" type="text" /></div>
         <div id="note-editor" class="editor" contenteditable="true"></div>
         <div class="editor-actions">
           <button id="save-note" class="primary-btn" type="button">L&#432;u nh&#7853;t k&#253;</button>
@@ -335,6 +338,37 @@
             </div>
           </div>
           <p id="share-status" class="security-hint">M&#7895;i l&#7847;n chia s&#7867; c&#7847;n d&#249;ng m&#7897;t kh&#243;a ki&#7875;m th&#7917; m&#7899;i.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="calendar-controls-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h3>Chọn tháng</h3>
+        <div class="field">
+          <label>Năm</label>
+          <select id="calendar-year-select"></select>
+        </div>
+        <div class="field">
+          <label>Tháng</label>
+          <select id="calendar-month-select">
+            <option value="0">Tháng 1</option>
+            <option value="1">Tháng 2</option>
+            <option value="2">Tháng 3</option>
+            <option value="3">Tháng 4</option>
+            <option value="4">Tháng 5</option>
+            <option value="5">Tháng 6</option>
+            <option value="6">Tháng 7</option>
+            <option value="7">Tháng 8</option>
+            <option value="8">Tháng 9</option>
+            <option value="9">Tháng 10</option>
+            <option value="10">Tháng 11</option>
+            <option value="11">Tháng 12</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button id="calendar-controls-close" class="text-btn" type="button">Đóng</button>
+          <button id="calendar-controls-apply" class="primary-btn" type="button">Áp dụng</button>
         </div>
       </div>
     </div>

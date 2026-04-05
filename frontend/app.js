@@ -177,6 +177,7 @@ const translations = {
       accountDeleted: "Tài khoản đã được đưa vào thùng rác 30 ngày.",
       needDeleteFields: "Bạn cần nhập mật khẩu hiện tại, khóa cá nhân hiện tại và OTP.",
       needPasswordFields: "Bạn cần nhập mật khẩu mới và OTP.",
+      calendarLocked: "Lịch đang bị khóa. Mở khóa nhật ký để xem lịch.",
       apiJsonError: "API trả về dữ liệu không hợp lệ. Vui lòng thử lại.",
     },
   },
@@ -322,6 +323,7 @@ const translations = {
       accountDeleted: "The account has been moved to trash for 30 days.",
       needDeleteFields: "Enter your current password, current personal key, and OTP.",
       needPasswordFields: "Enter the new password and OTP.",
+      calendarLocked: "Calendar is locked. Unlock diary to view calendar.",
       apiJsonError: "The API returned an invalid response. Please try again.",
     },
   },
@@ -504,8 +506,14 @@ const els = {
   calendarNoteInput: byId("calendar-note-input"),
   calendarSaveNote: byId("calendar-save-note"),
   calendarClearNote: byId("calendar-clear-note"),
+  calendarYearSelect: byId("calendar-year-select"),
+  calendarMonthSelect: byId("calendar-month-select"),
   calendarPrev: byId("calendar-prev"),
   calendarNext: byId("calendar-next"),
+  calendarSelectMonth: byId("calendar-select-month"),
+  calendarControlsModal: byId("calendar-controls-modal"),
+  calendarControlsClose: byId("calendar-controls-close"),
+  calendarControlsApply: byId("calendar-controls-apply"),
 };
 
 function t() { return translations[state.language]; }
@@ -553,6 +561,15 @@ function formatCalendarLabel(dateString) {
 
 function renderCalendarWidget() {
   if (!els.calendarGrid || !els.calendarMonthLabel || !els.calendarSelectedDate || !els.calendarNoteInput) return;
+
+  if (!state.notesUnlocked) {
+    // Show locked message
+    els.calendarMonthLabel.textContent = t().toasts.needUnlock;
+    els.calendarGrid.innerHTML = `<div class="calendar-locked">${t().toasts.calendarLocked}</div>`;
+    els.calendarSelectedDate.textContent = "";
+    els.calendarNoteInput.value = "";
+    return;
+  }
 
   const viewDate = new Date(state.calendarViewDate);
   const year = viewDate.getFullYear();
@@ -1043,6 +1060,64 @@ function downloadCurrentNoteAsWord() {
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+function initCalendarControls() {
+  if (!els.calendarYearSelect || !els.calendarMonthSelect || !els.calendarSelectMonth) return;
+
+  // Populate year select in modal
+  const currentYear = new Date().getFullYear();
+  for (let year = currentYear - 5; year <= currentYear + 5; year += 1) {
+    const option = document.createElement("option");
+    option.value = String(year);
+    option.textContent = String(year);
+    els.calendarYearSelect.appendChild(option);
+  }
+
+  // Month select is already populated in HTML
+
+  // Set current values
+  const viewDate = new Date(state.calendarViewDate);
+  els.calendarYearSelect.value = String(viewDate.getFullYear());
+  els.calendarMonthSelect.value = String(viewDate.getMonth());
+
+  // Event listeners
+  on(els.calendarSelectMonth, "click", () => {
+    if (els.calendarControlsModal) {
+      els.calendarControlsModal.classList.remove("hidden");
+    }
+  });
+
+  on(els.calendarControlsClose, "click", () => {
+    if (els.calendarControlsModal) {
+      els.calendarControlsModal.classList.add("hidden");
+    }
+  });
+
+  on(els.calendarControlsApply, "click", () => {
+    const year = parseInt(els.calendarYearSelect.value, 10);
+    const month = parseInt(els.calendarMonthSelect.value, 10);
+    state.calendarViewDate = new Date(year, month, 1).toISOString();
+    renderCalendarWidget();
+    if (els.calendarControlsModal) {
+      els.calendarControlsModal.classList.add("hidden");
+    }
+  });
+
+  on(els.calendarPrev, "click", () => {
+    const viewDate = new Date(state.calendarViewDate);
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    state.calendarViewDate = viewDate.toISOString();
+    renderCalendarWidget();
+  });
+
+  on(els.calendarNext, "click", () => {
+    const viewDate = new Date(state.calendarViewDate);
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    state.calendarViewDate = viewDate.toISOString();
+    renderCalendarWidget();
+  });
+}
+
 
 async function shareSelectedNote() {
   if (!state.selectedNoteId) return showToast(t().toasts.noNoteToShare);
@@ -1582,6 +1657,7 @@ function initDashboardPage() {
   renderMarketingContent();
   loadCalendarNotes();
   renderCalendarWidget();
+  initCalendarControls();
   document.querySelectorAll(".welcome-actions [data-screen]").forEach((button) => on(button, "click", async () => {
     switchScreen(button.dataset.screen);
     if (button.dataset.screen === "profile") await loadProfile();
