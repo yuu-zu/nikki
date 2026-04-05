@@ -24,6 +24,7 @@
             <button class="side-btn" data-screen="notes">Nh&#7853;t k&#253;</button>
             <button class="side-btn" data-screen="shared-notes">Nh&#7853;t k&#253; &#273;&#432;&#7907;c chia s&#7867;</button>
             <button class="side-btn" data-screen="trash">Th&#249;ng r&#225;c</button>
+            <button class="side-btn" data-screen="calendar">L&#7883;ch</button>
           </div>
 
           <div class="sidebar-footer">
@@ -119,6 +120,7 @@
                   <h3>B&#7843;o m&#7853;t c&#225; nh&#226;n</h3>
                   <p>V&#224;o th&#244;ng tin c&#225; nh&#226;n &#273;&#7875; c&#7853;p nh&#7853;t hi&#7875;n th&#7883;, kh&#243;a c&#225; nh&#226;n ho&#7863;c m&#7853;t kh&#7849;u khi c&#7847;n.</p>
                 </section>
+
               </div>
             </div>
           </div>
@@ -130,45 +132,7 @@
                 <button id="unlock-notes" class="secondary-btn" type="button">M&#7903; kh&#243;a nh&#7853;t k&#253;</button>
               </div>
               <p id="notes-security-hint" class="security-hint"></p>
-              <div class="notes-layout">
-                <div id="notes-list" class="notes-list"></div>
-                <div class="editor-card">
-                  <div class="field"><label>Ti&#234;u &#273;&#7873;</label><input id="note-title" type="text" /></div>
-                  <div class="editor-toolbar">
-                    <button data-command="bold" type="button"><b>B</b></button>
-                    <button data-command="italic" type="button"><i>I</i></button>
-                    <button data-command="justifyLeft" type="button">Tr&#225;i</button>
-                    <button data-command="justifyCenter" type="button">Gi&#7919;a</button>
-                    <button data-command="justifyRight" type="button">Ph&#7843;i</button>
-                  </div>
-                  <div id="note-editor" class="editor" contenteditable="true"></div>
-                  <div class="editor-actions">
-                    <button id="save-note" class="primary-btn" type="button">L&#432;u nh&#7853;t k&#253;</button>
-                    <button id="share-note" class="secondary-btn" type="button">Chia s&#7867;</button>
-                  </div>
-                  <div id="share-link-panel" class="share-panel hidden">
-                    <div class="field">
-                      <label>Quy&#7873;n chia s&#7867;</label>
-                      <select id="share-access-mode">
-                        <option value="view">Ch&#7881; xem</option>
-                        <option value="edit">Cho ch&#7881;nh s&#7917;a</option>
-                      </select>
-                    </div>
-                    <div id="share-recipient-field" class="field hidden">
-                      <label>T&#224;i kho&#7843;n ng&#432;&#7901;i nh&#7853;n</label>
-                      <input id="share-recipient" type="text" placeholder="Email ho&#7863;c t&#234;n ng&#432;&#7901;i d&#249;ng" />
-                    </div>
-                    <div class="field">
-                      <label>Link chia s&#7867;</label>
-                      <div class="share-row">
-                        <input id="share-link-output" type="text" readonly />
-                        <button id="copy-share-link" class="secondary-btn" type="button">Sao ch&#233;p</button>
-                      </div>
-                    </div>
-                    <p id="share-status" class="security-hint">M&#7895;i l&#7847;n chia s&#7867; c&#7847;n d&#249;ng m&#7897;t kh&#243;a ki&#7875;m th&#7917; m&#7899;i.</p>
-                  </div>
-                </div>
-              </div>
+              <div id="notes-list" class="notes-list note-card-grid"></div>
             </div>
           </div>
 
@@ -195,6 +159,40 @@
             <h3>Th&#249;ng r&#225;c 30 ng&#224;y</h3>
             <p>N&#7897;i dung trong th&#249;ng r&#225;c v&#7851;n &#273;&#432;&#7907;c gi&#7919; m&#227; h&#243;a tr&#432;&#7899;c khi b&#7883; x&#243;a v&#297;nh vi&#7877;n.</p>
             <div id="trash-list" class="notes-list trash-list"></div>
+          </div>
+
+          <div id="calendar" class="screen hidden">
+            <section class="calendar-card calendar-screen-card">
+              <div class="calendar-head">
+                <div>
+                  <h3>L&#7883;ch nh&#7855;c nhanh</h3>
+                  <p>Ghi ng&#7855;n cho nh&#7919;ng ng&#224;y quan tr&#7885;ng.</p>
+                </div>
+                <div class="calendar-nav">
+                  <button id="calendar-prev" class="secondary-btn" type="button">&#8249;</button>
+                  <button id="calendar-next" class="secondary-btn" type="button">&#8250;</button>
+                </div>
+              </div>
+              <div id="calendar-month-label" class="calendar-month-label"></div>
+              <div class="calendar-weekdays">
+                <span>T2</span>
+                <span>T3</span>
+                <span>T4</span>
+                <span>T5</span>
+                <span>T6</span>
+                <span>T7</span>
+                <span>CN</span>
+              </div>
+              <div id="calendar-grid" class="calendar-grid"></div>
+              <div class="calendar-note-panel">
+                <strong id="calendar-selected-date">Ch&#432;a ch&#7885;n ng&#224;y</strong>
+                <textarea id="calendar-note-input" rows="3" maxlength="120" placeholder="Vi&#7871;t nh&#7855;c ng&#7855;n cho ng&#224;y n&#224;y..."></textarea>
+                <div class="calendar-note-actions">
+                  <button id="calendar-save-note" class="primary-btn" type="button">L&#432;u nh&#7855;c</button>
+                  <button id="calendar-clear-note" class="text-btn" type="button">X&#243;a nh&#7855;c</button>
+                </div>
+              </div>
+            </section>
           </div>
 
           <div id="profile" class="screen hidden">
@@ -252,6 +250,94 @@
         <button id="create-note-fab" class="fab hidden" type="button">+</button>
       </section>
     </main>
+
+    <div id="note-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-card-wide note-modal-card">
+        <div class="shared-note-head">
+          <div>
+            <h3>So&#7841;n nh&#7853;t k&#253;</h3>
+            <p>M&#7903;, t&#7841;o m&#7899;i ho&#7863;c ch&#7881;nh s&#7917;a ghi ch&#250; trong m&#7897;t popup g&#7885;n g&#224;ng.</p>
+          </div>
+          <div class="shared-note-actions">
+            <button id="note-modal-close" class="text-btn" type="button">&#272;&#243;ng</button>
+          </div>
+        </div>
+        <div class="field"><label>Ti&#234;u &#273;&#7873;</label><input id="note-title" type="text" /></div>
+        <div class="editor-toolbar">
+          <button data-command="bold" type="button"><b>B</b></button>
+          <button data-command="italic" type="button"><i>I</i></button>
+          <button data-command="underline" type="button"><u>U</u></button>
+          <button data-command="justifyLeft" type="button">Tr&#225;i</button>
+          <button data-command="justifyCenter" type="button">Gi&#7919;a</button>
+          <button data-command="justifyRight" type="button">Ph&#7843;i</button>
+
+          <label class="toolbar-select-label">
+            <span>K&#237;ch th&#432;&#7901;c</span>
+            <select id="font-size-select">
+              <option value="">Ch&#7885;n</option>
+              <option value="1">10</option>
+              <option value="2">12</option>
+              <option value="3">14</option>
+              <option value="4">18</option>
+              <option value="5">24</option>
+              <option value="6">28</option>
+              <option value="7">32</option>
+            </select>
+          </label>
+
+          <label class="toolbar-select-label">
+            <span>Font</span>
+            <select id="font-family-select">
+              <option value="">M&#7841;c &#273;&#7883;nh</option>
+              <option value="Arial">Arial</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+          </label>
+
+          <label class="toolbar-select-label">
+            <span>M&#224;u ch&#7911;</span>
+            <input id="font-color" type="color" title="Ch&#7885;n m&#224;u ch&#7911;" />
+          </label>
+
+          <label class="toolbar-select-label">
+            <span>Highlighter</span>
+            <input id="highlight-color" type="color" title="Đánh dấu chữ" />
+          </label>
+
+          <button id="clear-format" type="button" title="X&#243;a &#273;&#7889;nh d&#7841;ng">X&#243;a</button>
+          <button id="download-word" class="secondary-btn" type="button">T&#7843;i Word</button>
+        </div>
+        <div id="note-editor" class="editor" contenteditable="true"></div>
+        <div class="editor-actions">
+          <button id="save-note" class="primary-btn" type="button">L&#432;u nh&#7853;t k&#253;</button>
+          <button id="share-note" class="secondary-btn" type="button">Chia s&#7867;</button>
+        </div>
+        <div id="share-link-panel" class="share-panel hidden">
+          <div class="field">
+            <label>Quy&#7873;n chia s&#7867;</label>
+            <select id="share-access-mode">
+              <option value="view">Ch&#7881; xem</option>
+              <option value="edit">Cho ch&#7881;nh s&#7917;a</option>
+            </select>
+          </div>
+          <div id="share-recipient-field" class="field hidden">
+            <label>T&#224;i kho&#7843;n ng&#432;&#7901;i nh&#7853;n</label>
+            <input id="share-recipient" type="text" placeholder="Email ho&#7863;c t&#234;n ng&#432;&#7901;i d&#249;ng" />
+          </div>
+          <div class="field">
+            <label>Link chia s&#7867;</label>
+            <div class="share-row">
+              <input id="share-link-output" type="text" readonly />
+              <button id="copy-share-link" class="secondary-btn" type="button">Sao ch&#233;p</button>
+            </div>
+          </div>
+          <p id="share-status" class="security-hint">M&#7895;i l&#7847;n chia s&#7867; c&#7847;n d&#249;ng m&#7897;t kh&#243;a ki&#7875;m th&#7917; m&#7899;i.</p>
+        </div>
+      </div>
+    </div>
 
     <div id="profile-access-modal" class="modal-overlay hidden">
       <div class="modal-card">

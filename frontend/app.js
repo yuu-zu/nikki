@@ -27,6 +27,9 @@ const state = {
   profileAccessUnlocked: false,
   sharedPayload: null,
   hasAuthenticatedInSession: sessionStorage.getItem("diaryAuthenticatedThisSession") === "true",
+  calendarViewDate: new Date(),
+  selectedCalendarDate: new Date().toISOString().split("T")[0],
+  calendarNotes: {},
 };
 
 if (!window.CryptoJS) throw new Error("CryptoJS failed to load. Check your internet connection or CDN access.");
@@ -408,6 +411,12 @@ const els = {
   trashList: byId("trash-list"),
   noteTitle: byId("note-title"),
   noteEditor: byId("note-editor"),
+  fontSizeSelect: byId("font-size-select"),
+  fontFamilySelect: byId("font-family-select"),
+  fontColorInput: byId("font-color"),
+  highlightColorInput: byId("highlight-color"),
+  clearFormat: byId("clear-format"),
+  downloadWord: byId("download-word"),
   saveNote: byId("save-note"),
   shareNote: byId("share-note"),
   fab: byId("create-note-fab"),
@@ -418,6 +427,8 @@ const els = {
   shareLinkOutput: byId("share-link-output"),
   copyShareLink: byId("copy-share-link"),
   shareStatus: byId("share-status"),
+  noteModal: byId("note-modal"),
+  noteModalClose: byId("note-modal-close"),
   sharedWithMeList: byId("shared-with-me-list"),
   sharedByMeList: byId("shared-by-me-list"),
   profileDisplayName: byId("profile-display-name"),
@@ -487,6 +498,14 @@ const els = {
   sharedNoteUnlock: byId("shared-note-unlock"),
   sharedNoteSave: byId("shared-note-save"),
   sharedNoteContent: byId("shared-note-content"),
+  calendarMonthLabel: byId("calendar-month-label"),
+  calendarGrid: byId("calendar-grid"),
+  calendarSelectedDate: byId("calendar-selected-date"),
+  calendarNoteInput: byId("calendar-note-input"),
+  calendarSaveNote: byId("calendar-save-note"),
+  calendarClearNote: byId("calendar-clear-note"),
+  calendarPrev: byId("calendar-prev"),
+  calendarNext: byId("calendar-next"),
 };
 
 function t() { return translations[state.language]; }
@@ -496,6 +515,85 @@ function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.remove("hidden");
   setTimeout(() => els.toast && els.toast.classList.add("hidden"), 2500);
+}
+
+function getCalendarStorageKey() {
+  const userKey = state.user?.id || state.user?.uid || state.user?.username || "guest";
+  return `bloomnote-calendar:${userKey}`;
+}
+
+function loadCalendarNotes() {
+  try {
+    state.calendarNotes = JSON.parse(localStorage.getItem(getCalendarStorageKey()) || "{}");
+  } catch {
+    state.calendarNotes = {};
+  }
+}
+
+function saveCalendarNotes() {
+  localStorage.setItem(getCalendarStorageKey(), JSON.stringify(state.calendarNotes));
+}
+
+function formatCalendarDate(date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatCalendarLabel(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(state.language === "vi" ? "vi-VN" : "en-US", {
+    weekday: "short",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function renderCalendarWidget() {
+  if (!els.calendarGrid || !els.calendarMonthLabel || !els.calendarSelectedDate || !els.calendarNoteInput) return;
+
+  const viewDate = new Date(state.calendarViewDate);
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthStart = new Date(year, month, 1);
+  const monthEnd = new Date(year, month + 1, 0);
+  const startOffset = (monthStart.getDay() + 6) % 7;
+  const totalCells = Math.ceil((startOffset + monthEnd.getDate()) / 7) * 7;
+  const today = formatCalendarDate(new Date());
+
+  els.calendarMonthLabel.textContent = viewDate.toLocaleDateString(state.language === "vi" ? "vi-VN" : "en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const cells = [];
+  for (let index = 0; index < totalCells; index += 1) {
+    const cellDate = new Date(year, month, index - startOffset + 1);
+    const dateValue = formatCalendarDate(cellDate);
+    const isOutside = cellDate.getMonth() !== month;
+    const isToday = dateValue === today;
+    const isSelected = dateValue === state.selectedCalendarDate;
+    const hasNote = Boolean(state.calendarNotes[dateValue]);
+
+    cells.push(`
+      <button
+        class="calendar-day${isOutside ? " is-outside" : ""}${isToday ? " is-today" : ""}${isSelected ? " is-selected" : ""}${hasNote ? " has-note" : ""}"
+        type="button"
+        data-calendar-date="${dateValue}"
+      >${cellDate.getDate()}</button>
+    `);
+  }
+
+  els.calendarGrid.innerHTML = cells.join("");
+  els.calendarSelectedDate.textContent = formatCalendarLabel(state.selectedCalendarDate);
+  els.calendarNoteInput.value = state.calendarNotes[state.selectedCalendarDate] || "";
+
+  els.calendarGrid.querySelectorAll("[data-calendar-date]").forEach((button) => on(button, "click", () => {
+    state.selectedCalendarDate = button.dataset.calendarDate;
+    renderCalendarWidget();
+  }));
 }
 function renderTagList(container, items) { if (container) container.innerHTML = items.map((item) => `<span>${escapeHtml(item)}</span>`).join(""); }
 function goToHome(section = "") { window.location.href = `/index.html${section ? `#${section}` : ""}`; }
@@ -590,6 +688,7 @@ function renderMarketingContent() {
   if (page === "dashboard") {
     renderDashboardStats();
     updateUnlockStateUI();
+    renderCalendarWidget();
     switchScreen(state.currentScreen);
   }
 }
@@ -735,13 +834,23 @@ function updateUnlockStateUI() {
   els.notesSecurityHint.textContent = state.notesUnlocked ? copy.unlockedHint : copy.lockedHint;
   els.noteSearch.placeholder = t().toasts.searchPlaceholder;
   if (els.shareStatus) els.shareStatus.textContent = t().toasts.shareInfo;
-  if (els.noteEditor) els.noteEditor.classList.toggle("is-locked", !state.notesUnlocked && Boolean(state.selectedNoteId));
+  if (els.noteEditor) els.noteEditor.classList.toggle("is-locked", !state.notesUnlocked);
+  if (els.saveNote) els.saveNote.disabled = !state.notesUnlocked;
+  if (els.shareNote) els.shareNote.disabled = !state.notesUnlocked;
+  if (els.fab) els.fab.disabled = !state.notesUnlocked;
+}
+
+function ensureNotesUnlockedForAction() {
+  if (state.notesUnlocked) return true;
+  showToast(t().toasts.needUnlock);
+  return false;
 }
 
 function renderNotes() {
   if (!els.notesList || !els.trashList || !els.noteSearch) return;
   const copy = t().dashboard;
   const query = els.noteSearch.value.trim().toLowerCase();
+  const lockedActionAttrs = state.notesUnlocked ? "" : ' disabled aria-disabled="true"';
   const visibleNotes = state.notes.filter((note) => {
     const title = state.notesUnlocked && canDecryptNote(note) ? getNoteTitle(note) : t().toasts.encryptedTitle;
     return !query || title.toLowerCase().includes(query);
@@ -753,7 +862,7 @@ function renderNotes() {
       const isReadable = state.notesUnlocked && canDecryptNote(note);
       const title = isReadable ? getNoteTitle(note) : t().toasts.encryptedTitle;
       const preview = isReadable ? getNoteContent(note) : note.encryptedContent;
-      return `<article class="note-card"><span class="note-meta">${isReadable ? copy.unlockedBadge : copy.lockedBadge}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml((preview || note.encryptedContent || "").slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="selectNote('${note.id}')">${copy.openLabel}</button><button class="secondary-btn" type="button" onclick="deleteNote('${note.id}')">${copy.deleteLabel}</button></div></article>`;
+      return `<article class="note-card note-card-clickable" onclick="selectNote('${note.id}')"><span class="note-meta">${isReadable ? copy.unlockedBadge : copy.lockedBadge}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml((preview || note.encryptedContent || "").slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="event.stopPropagation(); selectNote('${note.id}')"${lockedActionAttrs}>${copy.openLabel}</button><button class="secondary-btn" type="button" onclick="event.stopPropagation(); deleteNote('${note.id}')"${lockedActionAttrs}>${copy.deleteLabel}</button></div></article>`;
     }).join("");
   }
   if (!state.trash.length) {
@@ -764,13 +873,13 @@ function renderNotes() {
     const isReadable = state.notesUnlocked && canDecryptNote(note);
     const title = isReadable ? getNoteTitle(note) : t().toasts.encryptedTitle;
     const preview = isReadable ? getNoteContent(note) : note.encryptedContent || "";
-    return `<article class="note-card"><span class="note-meta">${escapeHtml(isReadable ? copy.unlockedBadge : copy.lockedBadge)}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml(preview.slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="restoreNote('${note.id}')">${copy.restoreLabel}</button><button class="secondary-btn" type="button" onclick="permanentlyDeleteNote('${note.id}')">${copy.permanentDeleteLabel}</button></div></article>`;
+    return `<article class="note-card"><span class="note-meta">${escapeHtml(isReadable ? copy.unlockedBadge : copy.lockedBadge)}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml(preview.slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="restoreNote('${note.id}')"${lockedActionAttrs}>${copy.restoreLabel}</button><button class="secondary-btn" type="button" onclick="permanentlyDeleteNote('${note.id}')"${lockedActionAttrs}>${copy.permanentDeleteLabel}</button></div></article>`;
   }).join("");
 }
 
 function setEditorMode() {
   if (!els.noteEditor || !els.noteTitle) return;
-  const locked = Boolean(state.selectedNoteId) && !state.notesUnlocked;
+  const locked = !state.notesUnlocked;
   els.noteEditor.contentEditable = String(!locked);
   els.noteEditor.classList.toggle("is-locked", locked);
   els.noteTitle.readOnly = locked;
@@ -782,7 +891,12 @@ function switchScreen(screenId) {
   els.screens.forEach((screen) => screen.classList.toggle("hidden", screen.id !== screenId));
   els.sideButtons.forEach((button) => button.classList.toggle("active", button.dataset.screen === screenId));
   if (els.fab) els.fab.classList.toggle("hidden", screenId !== "notes");
-  const [title, subtitle] = t().dashboard.screens[screenId] || ["Dashboard", ""];
+  const customScreens = {
+    calendar: state.language === "vi"
+      ? ["Lịch", "Đánh dấu những ngày quan trọng bằng ghi chú ngắn."]
+      : ["Calendar", "Mark important days with short reminders."],
+  };
+  const [title, subtitle] = customScreens[screenId] || t().dashboard.screens[screenId] || ["Dashboard", ""];
   if (els.screenTitle) els.screenTitle.textContent = title;
   if (els.screenSubtitle) els.screenSubtitle.textContent = subtitle;
   updateUnlockStateUI();
@@ -843,24 +957,20 @@ function renderSharedLists() {
 }
 
 window.selectNote = function selectNote(noteId) {
+  if (!ensureNotesUnlockedForAction()) return;
   const note = state.notes.find((item) => item.id === noteId);
   if (!note) return;
-  if (!state.notesUnlocked) {
-    state.selectedNoteId = noteId;
-    els.noteTitle.value = note.title || "";
-    els.noteEditor.innerHTML = "";
-    setEditorMode();
-    return showToast(t().toasts.unlockRequiredForExisting);
-  }
   if (!canDecryptNote(note)) return showToast(t().toasts.invalidKey);
   state.selectedNoteId = noteId;
   els.noteTitle.value = getNoteTitle(note);
   els.noteEditor.innerHTML = getNoteContent(note);
   if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
   setEditorMode();
+  openNoteModal();
 };
 
 window.deleteNote = async function deleteNote(noteId) {
+  if (!ensureNotesUnlockedForAction()) return;
   try {
     await api(`/notes/${noteId}`, { method: "DELETE" });
     if (state.selectedNoteId === noteId) {
@@ -874,10 +984,12 @@ window.deleteNote = async function deleteNote(noteId) {
 };
 
 window.restoreNote = async function restoreNote(noteId) {
+  if (!ensureNotesUnlockedForAction()) return;
   try { await api(`/notes/${noteId}/restore`, { method: "POST" }); showToast(t().toasts.restored); await refreshNotes(); } catch (error) { showToast(error.message); }
 };
 
 window.permanentlyDeleteNote = async function permanentlyDeleteNote(noteId) {
+  if (!ensureNotesUnlockedForAction()) return;
   try {
     await api(`/notes/${noteId}/permanent`, { method: "DELETE" });
     if (state.selectedNoteId === noteId) {
@@ -889,6 +1001,7 @@ window.permanentlyDeleteNote = async function permanentlyDeleteNote(noteId) {
 };
 
 async function saveNote() {
+  if (!ensureNotesUnlockedForAction()) return;
   const title = els.noteTitle.value.trim();
   const content = els.noteEditor.innerHTML.trim();
   const encryptionKey = getEncryptionKey();
@@ -902,8 +1015,33 @@ async function saveNote() {
     });
     showToast(t().toasts.saved);
     resetNoteEditorForNewEntry();
+    closeNoteModal();
     await refreshNotes();
   } catch (error) { showToast(error.message); }
+}
+
+function formatEditor(command, value = null) {
+  if (!ensureNotesUnlockedForAction()) return;
+  if (!els.noteEditor) return;
+  els.noteEditor.focus();
+  document.execCommand("styleWithCSS", false, true);
+  document.execCommand(command, false, value);
+}
+
+function downloadCurrentNoteAsWord() {
+  const title = els.noteTitle.value.trim() || "Diary entry";
+  const content = els.noteEditor.innerHTML || "";
+  const safeTitle = title.replace(/[^a-zA-Z0-9\-_ ]/g, "").trim() || "diary-entry";
+  const wordHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${safeTitle}</title></head><body>${content}</body></html>`;
+  const blob = new Blob(["\ufeff", wordHtml], { type: "application/msword" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${safeTitle}.doc`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 async function shareSelectedNote() {
@@ -940,6 +1078,8 @@ async function loadProfile() {
   const user = await api("/user/me");
   state.user = user;
   localStorage.setItem("diaryUser", JSON.stringify(user));
+  loadCalendarNotes();
+  renderCalendarWidget();
   els.profileDisplayName.value = user.displayName || "";
   els.profileUsername.value = user.username || "";
   els.profileBirthDate.value = user.birthDate || "";
@@ -963,6 +1103,10 @@ async function saveProfile() {
 }
 
 function resetNoteEditorForNewEntry() {
+  if (!state.notesUnlocked) {
+    setEditorMode();
+    return;
+  }
   state.selectedNoteId = null;
   if (els.noteTitle) els.noteTitle.value = "";
   if (els.noteEditor) els.noteEditor.innerHTML = "";
@@ -987,6 +1131,23 @@ async function requestPersonalKeyOtp() {
 
 function openModal(element) { if (element) element.classList.remove("hidden"); }
 function closeModal(element) { if (element) element.classList.add("hidden"); }
+function openNoteModal() { openModal(els.noteModal); }
+function closeNoteModal() {
+  if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
+  closeModal(els.noteModal);
+}
+function prepareNewNoteModal() {
+  if (!state.notesUnlocked) {
+    setEditorMode();
+    return;
+  }
+  state.selectedNoteId = null;
+  if (els.noteTitle) els.noteTitle.value = "";
+  if (els.noteEditor) els.noteEditor.innerHTML = "";
+  if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
+  setEditorMode();
+  openNoteModal();
+}
 function openSecurityStepModal(element) {
   closeModal(els.securityModal);
   openModal(element);
@@ -1419,6 +1580,8 @@ function initLoginPage() {
 
 function initDashboardPage() {
   renderMarketingContent();
+  loadCalendarNotes();
+  renderCalendarWidget();
   document.querySelectorAll(".welcome-actions [data-screen]").forEach((button) => on(button, "click", async () => {
     switchScreen(button.dataset.screen);
     if (button.dataset.screen === "profile") await loadProfile();
@@ -1477,7 +1640,27 @@ function initDashboardPage() {
     if (action === "switch") { clearSession(); showToast(t().toasts.switchAccount); return goToLogin(); }
     if (action === "logout") { clearSession(); showToast(t().toasts.logout); return goToHome(); }
   }));
-  document.querySelectorAll(".editor-toolbar button").forEach((button) => on(button, "click", () => { if (!state.selectedNoteId || state.notesUnlocked) document.execCommand(button.dataset.command, false, null); }));
+  document.querySelectorAll(".editor-toolbar button[data-command]").forEach((button) => on(button, "click", () => formatEditor(button.dataset.command, button.dataset.value)));
+  on(els.fontSizeSelect, "change", () => {
+    const value = els.fontSizeSelect.value;
+    if (!value) return;
+    formatEditor("fontSize", value);
+    els.fontSizeSelect.value = "";
+  });
+  on(els.fontFamilySelect, "change", () => {
+    if (!els.fontFamilySelect.value) return;
+    formatEditor("fontName", els.fontFamilySelect.value);
+  });
+  on(els.fontColorInput, "change", () => {
+    if (!els.fontColorInput.value) return;
+    formatEditor("foreColor", els.fontColorInput.value);
+  });
+  on(els.highlightColorInput, "change", () => {
+    if (!els.highlightColorInput.value) return;
+    formatEditor("hiliteColor", els.highlightColorInput.value);
+  });
+  on(els.clearFormat, "click", () => formatEditor("removeFormat"));
+  on(els.downloadWord, "click", downloadCurrentNoteAsWord);
   on(els.noteSearch, "input", renderNotes);
   on(els.unlockNotes, "click", () => {
     if (state.notesUnlocked) {
@@ -1485,6 +1668,7 @@ function initDashboardPage() {
       state.personalKey = "";
       sessionStorage.removeItem("personalKey");
       resetNoteEditorForNewEntry();
+      closeNoteModal();
       renderDashboardStats();
       updateUnlockStateUI();
       renderNotes();
@@ -1494,7 +1678,11 @@ function initDashboardPage() {
   });
   on(els.saveNote, "click", saveNote);
   on(els.shareNote, "click", shareSelectedNote);
-  on(els.fab, "click", () => { switchScreen("notes"); resetNoteEditorForNewEntry(); });
+  on(els.fab, "click", () => {
+    if (!ensureNotesUnlockedForAction()) return;
+    switchScreen("notes");
+    prepareNewNoteModal();
+  });
   on(els.saveProfile, "click", saveProfile);
   on(els.openSecurityPanel, "click", () => openModal(els.securityModal));
   on(els.securityOptionPassword, "click", () => openSecurityStepModal(els.securityPasswordModal));
@@ -1518,6 +1706,7 @@ function initDashboardPage() {
   on(els.profileOtpSubmit, "click", confirmProfileAccessOtp);
   on(els.recoverySubmit, "click", confirmRecoveryOtp);
   on(els.recoveryClose, "click", () => closeModal(els.recoveryModal));
+  on(els.noteModalClose, "click", closeNoteModal);
   on(els.profileAccessSubmit, "click", async () => {
     const key = els.profileAccessKey.value.trim();
     if (!key) return showToast(t().toasts.needProfileKey);
@@ -1533,6 +1722,31 @@ function initDashboardPage() {
     if (!els.shareLinkOutput.value) return;
     await navigator.clipboard.writeText(els.shareLinkOutput.value);
     showToast(t().toasts.shareCreated);
+  });
+  on(els.calendarPrev, "click", () => {
+    state.calendarViewDate = new Date(state.calendarViewDate.getFullYear(), state.calendarViewDate.getMonth() - 1, 1);
+    renderCalendarWidget();
+  });
+  on(els.calendarNext, "click", () => {
+    state.calendarViewDate = new Date(state.calendarViewDate.getFullYear(), state.calendarViewDate.getMonth() + 1, 1);
+    renderCalendarWidget();
+  });
+  on(els.calendarSaveNote, "click", () => {
+    const value = (els.calendarNoteInput?.value || "").trim();
+    if (!value) {
+      delete state.calendarNotes[state.selectedCalendarDate];
+    } else {
+      state.calendarNotes[state.selectedCalendarDate] = value.slice(0, 120);
+    }
+    saveCalendarNotes();
+    renderCalendarWidget();
+    showToast(state.language === "vi" ? "Đã lưu nhắc lịch." : "Calendar note saved.");
+  });
+  on(els.calendarClearNote, "click", () => {
+    delete state.calendarNotes[state.selectedCalendarDate];
+    saveCalendarNotes();
+    renderCalendarWidget();
+    showToast(state.language === "vi" ? "Đã xóa nhắc lịch." : "Calendar note removed.");
   });
   on(els.notesUnlockConfirm, "click", confirmUnlockNotes);
   on(els.notesUnlockClose, "click", () => closeModal(els.notesUnlockModal));

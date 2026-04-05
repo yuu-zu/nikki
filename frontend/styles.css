@@ -716,6 +716,12 @@ body[data-page="login"] .card h2 {
   background: var(--accent-dark);
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .secondary-btn,
 .user-badge {
   background: rgba(49, 89, 78, 0.12);
@@ -850,6 +856,7 @@ body[data-page="login"] .card h2 {
 .welcome-card,
 .activity-card,
 .quick-card,
+.calendar-card,
 .status-card,
 .editor-card,
 .shared-column,
@@ -864,6 +871,7 @@ body[data-page="login"] .card h2 {
 .welcome-card,
 .activity-card,
 .quick-card,
+.calendar-card,
 .status-card {
   border-radius: 26px;
   padding: 24px;
@@ -878,6 +886,8 @@ body[data-page="login"] .card h2 {
 .welcome-card h2,
 .activity-card h3,
 .quick-card h3,
+.calendar-card h3,
+.sidebar-calendar h3,
 .status-card h3,
 #trash h3 {
   margin: 0 0 10px;
@@ -886,6 +896,8 @@ body[data-page="login"] .card h2 {
 .welcome-card p,
 .activity-card p,
 .quick-card p,
+.calendar-card p,
+.sidebar-calendar p,
 .status-card p,
 .shared-heading p,
 #trash > p {
@@ -965,6 +977,99 @@ body[data-page="login"] .card h2 {
   padding-left: 18px;
   color: var(--muted);
   line-height: 1.8;
+}
+
+.calendar-card,
+.calendar-screen-card {
+  display: grid;
+  gap: 16px;
+  background:
+    radial-gradient(circle at top right, rgba(180, 83, 42, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 248, 240, 0.72));
+}
+
+.calendar-head,
+.calendar-nav,
+.calendar-note-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-head {
+  justify-content: space-between;
+}
+
+.calendar-month-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1px solid rgba(192, 157, 120, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.calendar-day:hover {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.calendar-day.is-outside {
+  opacity: 0.35;
+}
+
+.calendar-day.is-today {
+  border-color: rgba(49, 89, 78, 0.34);
+  color: var(--forest);
+}
+
+.calendar-day.is-selected {
+  background: rgba(180, 83, 42, 0.14);
+  border-color: rgba(180, 83, 42, 0.4);
+  color: var(--accent-dark);
+}
+
+.calendar-day.has-note {
+  box-shadow: inset 0 -4px 0 rgba(180, 83, 42, 0.7);
+}
+
+.calendar-note-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(192, 157, 120, 0.18);
+}
+
+#calendar-note-input {
+  width: 100%;
+  resize: none;
+  border: 1px solid rgba(192, 157, 120, 0.24);
+  background: rgba(255, 253, 248, 0.92);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 14px 16px;
 }
 
 .dropdown {
@@ -1064,13 +1169,6 @@ body[data-page="login"] .card h2 {
   flex-wrap: wrap;
 }
 
-.notes-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 18px;
-  margin-top: 18px;
-}
-
 .notes-list,
 .trash-list {
   display: flex;
@@ -1085,6 +1183,30 @@ body[data-page="login"] .card h2 {
   border-radius: 18px;
   padding: 16px;
   background: var(--panel-strong);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.note-card p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.note-card-clickable {
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.note-card-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(74, 41, 20, 0.12);
+}
+
+.note-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+  justify-content: start;
 }
 
 .note-card h4 {
@@ -1127,13 +1249,39 @@ body[data-page="login"] .card h2 {
   gap: 8px;
   margin-bottom: 14px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.editor-toolbar button {
+.editor-toolbar button,
+.editor-toolbar select,
+.editor-toolbar input[type="color"] {
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(192, 157, 120, 0.35);
   background: white;
+  color: var(--text);
+  font: inherit;
+}
+
+.editor-toolbar select {
+  min-width: 110px;
+}
+
+.editor-toolbar input[type="color"] {
+  width: 42px;
+  padding: 6px;
+}
+
+.toolbar-select-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.toolbar-select-label span {
+  white-space: nowrap;
 }
 
 .full-span {
@@ -1151,6 +1299,16 @@ body[data-page="login"] .card h2 {
   color: white;
   font-size: 34px;
   box-shadow: var(--shadow);
+}
+
+.note-modal-card {
+  max-height: min(88vh, 920px);
+  overflow-y: auto;
+  background: rgba(255, 250, 244, 0.92);
+}
+
+.calendar-screen-card {
+  width: min(760px, 100%);
 }
 
 .toast {
