@@ -499,7 +499,13 @@ const els = {
   sharedNoteAccessKey: byId("shared-note-access-key"),
   sharedNoteUnlock: byId("shared-note-unlock"),
   sharedNoteSave: byId("shared-note-save"),
-  sharedNoteContent: byId("shared-note-content"),
+  sharedNoteEditor: byId("shared-note-editor"),
+  sharedToolbar: byId("shared-toolbar"),
+  sharedFontSizeSelect: byId("shared-font-size-select"),
+  sharedFontFamilySelect: byId("shared-font-family-select"),
+  sharedFontColor: byId("shared-font-color"),
+  sharedHighlightColor: byId("shared-highlight-color"),
+  sharedClearFormat: byId("shared-clear-format"),
   calendarMonthLabel: byId("calendar-month-label"),
   calendarGrid: byId("calendar-grid"),
   calendarSelectedDate: byId("calendar-selected-date"),
@@ -1037,10 +1043,10 @@ async function saveNote() {
   } catch (error) { showToast(error.message); }
 }
 
-function formatEditor(command, value = null) {
-  if (!ensureNotesUnlockedForAction()) return;
-  if (!els.noteEditor) return;
-  els.noteEditor.focus();
+function formatEditor(command, value = null, target = null) {
+  const editor = target || els.noteEditor;
+  if (!editor) return;
+  editor.focus();
   document.execCommand("styleWithCSS", false, true);
   document.execCommand(command, false, value);
 }
@@ -1497,8 +1503,10 @@ async function openSharedNoteForDashboard(shareId) {
     els.sharedNoteTitleInput.value = data.canView ? "" : t().toasts.encryptedTitle;
     els.sharedNoteTitleInput.readOnly = true;
   }
-  els.sharedNoteContent.value = data.encryptedContent || "";
-  els.sharedNoteContent.readOnly = true;
+  if (els.sharedNoteEditor) {
+    els.sharedNoteEditor.innerHTML = data.encryptedContent || "";
+    els.sharedNoteEditor.contentEditable = false;
+  }
   if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", true);
 }
 
@@ -1675,10 +1683,13 @@ function initDashboardPage() {
     if (!title || !content) return showToast(t().toasts.sharedUnlockFailed);
     els.sharedNoteTitle.textContent = title;
     if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.value = title;
-    els.sharedNoteContent.value = content;
+    if (els.sharedNoteEditor) {
+      els.sharedNoteEditor.innerHTML = content;
+      els.sharedNoteEditor.contentEditable = canEdit;
+    }
     const canEdit = Boolean(state.sharedPayload.canEdit && (state.sharedPayload.isOwner || state.sharedPayload.isRecipient));
     if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.readOnly = !canEdit;
-    els.sharedNoteContent.readOnly = !canEdit;
+    if (els.sharedToolbar) els.sharedToolbar.classList.toggle("hidden", !canEdit);
     if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", !canEdit);
     showToast(t().toasts.sharedUnlockSuccess);
   });
@@ -1688,7 +1699,7 @@ function initDashboardPage() {
       const sharedTestKey = els.sharedNoteAccessKey.value.trim();
       await api(`/notes/shares/${state.selectedSharedNoteId}`, {
         method: "PUT",
-        body: JSON.stringify({ title: els.sharedNoteTitleInput.value.trim(), content: els.sharedNoteContent.value.trim(), sharedTestKey }),
+        body: JSON.stringify({ title: els.sharedNoteTitleInput.value.trim(), content: els.sharedNoteEditor.innerHTML.trim(), sharedTestKey }),
       });
       showToast(t().toasts.shareSaved);
       await refreshSharedNotes();
@@ -1716,26 +1727,42 @@ function initDashboardPage() {
     if (action === "switch") { clearSession(); showToast(t().toasts.switchAccount); return goToLogin(); }
     if (action === "logout") { clearSession(); showToast(t().toasts.logout); return goToHome(); }
   }));
-  document.querySelectorAll(".editor-toolbar button[data-command]").forEach((button) => on(button, "click", () => formatEditor(button.dataset.command, button.dataset.value)));
+  document.querySelectorAll(".editor-toolbar:not(.shared-toolbar) button[data-command]").forEach((button) => on(button, "click", () => {
+    if (!ensureNotesUnlockedForAction()) return;
+    formatEditor(button.dataset.command, button.dataset.value);
+  }));
   on(els.fontSizeSelect, "change", () => {
     const value = els.fontSizeSelect.value;
     if (!value) return;
+    if (!ensureNotesUnlockedForAction()) return;
     formatEditor("fontSize", value);
     els.fontSizeSelect.value = "";
   });
   on(els.fontFamilySelect, "change", () => {
     if (!els.fontFamilySelect.value) return;
+    if (!ensureNotesUnlockedForAction()) return;
     formatEditor("fontName", els.fontFamilySelect.value);
   });
   on(els.fontColorInput, "change", () => {
     if (!els.fontColorInput.value) return;
+    if (!ensureNotesUnlockedForAction()) return;
     formatEditor("foreColor", els.fontColorInput.value);
   });
   on(els.highlightColorInput, "change", () => {
     if (!els.highlightColorInput.value) return;
+    if (!ensureNotesUnlockedForAction()) return;
     formatEditor("hiliteColor", els.highlightColorInput.value);
   });
   on(els.clearFormat, "click", () => formatEditor("removeFormat"));
+  // Shared toolbar events
+  if (els.sharedToolbar) {
+    els.sharedToolbar.querySelectorAll("button[data-command]").forEach((button) => on(button, "click", () => formatEditor(button.dataset.command, button.dataset.value, els.sharedNoteEditor)));
+    on(els.sharedFontSizeSelect, "change", () => formatEditor("fontSize", els.sharedFontSizeSelect.value, els.sharedNoteEditor));
+    on(els.sharedFontFamilySelect, "change", () => formatEditor("fontName", els.sharedFontFamilySelect.value, els.sharedNoteEditor));
+    on(els.sharedFontColor, "input", () => formatEditor("foreColor", els.sharedFontColor.value, els.sharedNoteEditor));
+    on(els.sharedHighlightColor, "input", () => formatEditor("hiliteColor", els.sharedHighlightColor.value, els.sharedNoteEditor));
+    on(els.sharedClearFormat, "click", () => formatEditor("removeFormat", null, els.sharedNoteEditor));
+  }
   on(els.downloadWord, "click", downloadCurrentNoteAsWord);
   on(els.noteSearch, "input", renderNotes);
   on(els.unlockNotes, "click", () => {

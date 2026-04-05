@@ -231,6 +231,52 @@
                   <button id="shared-note-save" class="primary-btn hidden" type="button">L&#432;u thay &#273;&#7893;i</button>
                 </div>
               </div>
+              <div class="editor-toolbar shared-toolbar hidden">
+                <button data-command="bold" type="button"><b>B</b></button>
+                <button data-command="italic" type="button"><i>I</i></button>
+                <button data-command="underline" type="button"><u>U</u></button>
+                <button data-command="justifyLeft" type="button">Tr&#225;i</button>
+                <button data-command="justifyCenter" type="button">Gi&#7919;a</button>
+                <button data-command="justifyRight" type="button">Ph&#7843;i</button>
+
+                <label class="toolbar-select-label">
+                  <span>K&#237;ch th&#432;&#7901;c</span>
+                  <select id="shared-font-size-select">
+                    <option value="">Ch&#7885;n</option>
+                    <option value="1">10</option>
+                    <option value="2">12</option>
+                    <option value="3">14</option>
+                    <option value="4">18</option>
+                    <option value="5">24</option>
+                    <option value="6">28</option>
+                    <option value="7">32</option>
+                  </select>
+                </label>
+
+                <label class="toolbar-select-label">
+                  <span>Font</span>
+                  <select id="shared-font-family-select">
+                    <option value="">M&#7841;c &#273;&#7883;nh</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Verdana">Verdana</option>
+                  </select>
+                </label>
+
+                <label class="toolbar-select-label">
+                  <span>M&#224;u ch&#7911;</span>
+                  <input id="shared-font-color" type="color" title="Ch&#7885;n m&#224;u ch&#7911;" />
+                </label>
+
+                <label class="toolbar-select-label">
+                  <span>Highlighter</span>
+                  <input id="shared-highlight-color" type="color" title="&#272;&#225;nh d&#7845;u ch&#7911;" />
+                </label>
+
+                <button id="shared-clear-format" type="button" title="X&#243;a &#273;&#7889;nh d&#7841;ng">X&#243;a</button>
+              </div>
               <div class="field">
                 <label>Kh&#243;a ki&#7875;m th&#7917;</label>
                 <div class="share-row">
@@ -243,7 +289,7 @@
               </div>
               <div class="field">
                 <label>N&#7897;i dung</label>
-                <textarea id="shared-note-content" rows="16" readonly></textarea>
+                <div id="shared-note-editor" class="editor" contenteditable="false"></div>
               </div>
             </div>
           </div>
