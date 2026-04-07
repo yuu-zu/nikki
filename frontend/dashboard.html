@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BloomNote Dashboard</title>
+    <title>NIKKI Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
   </head>
   <body data-page="dashboard">
     <main class="main-shell">
-      <section class="dashboard">
+      <section class="dashboard" style="position: relative;">
         <aside class="sidebar">
-          <div>
-            <div class="sidebar-logo">BloomNote</div>
+            <div class="sidebar-logo">NIKKI</div>
             <p class="sidebar-note">Kh&#244;ng gian ri&#234;ng cho vi&#7871;t, l&#432;u v&#224; qu&#7843;n l&#253; nh&#7853;t k&#253; c&#225; nh&#226;n.</p>
           </div>
 
@@ -25,7 +25,6 @@
             <button class="side-btn" data-screen="notes">Nh&#7853;t k&#253;</button>
             <button class="side-btn" data-screen="shared-notes">Nh&#7853;t k&#253; &#273;&#432;&#7907;c chia s&#7867;</button>
             <button class="side-btn" data-screen="trash">Th&#249;ng r&#225;c</button>
-            <button class="side-btn" data-screen="calendar">L&#7883;ch</button>
           </div>
 
           <div class="sidebar-footer">
@@ -37,16 +36,40 @@
         <div class="parent-container">
         <section class="dashboard-content">
           <div class="dashboard-header">
-            <div>
-              <h1 id="screen-title">T&#7893;ng quan</h1>
-              <p id="screen-subtitle">Qu&#7843;n l&#253; nh&#7853;t k&#253; an to&#224;n v&#224; ri&#234;ng t&#432;.</p>
+            
+            <div class="dashboard-topbar-left">
+              <div class="nav-pill-container">
+                <button id="dashboard-menu-toggle" class="icon-btn" type="button" aria-label="Menu">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <div class="nav-divider"></div>
+                <button id="dashboard-home-btn" class="icon-btn" type="button" aria-label="Home">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </button>
+              </div>
+
+              <div class="header-titles">
+                <h1 id="screen-title" class="topbar-title">Tổng quan</h1>
+                <p id="screen-subtitle" class="topbar-subtitle">Quản lý nhật ký an toàn và riêng tư.</p>
+              </div>
             </div>
-            <div class="user-menu">
-              <button id="user-dropdown-trigger" class="user-badge" type="button">User</button>
-              <div id="user-dropdown" class="dropdown hidden">
-                <button data-profile-action="profile" type="button">Th&#244;ng tin c&#225; nh&#226;n</button>
-                <button data-profile-action="switch" type="button">&#272;&#7893;i t&#224;i kho&#7843;n</button>
-                <button data-profile-action="logout" type="button">&#272;&#259;ng xu&#7845;t</button>
+
+            <div class="dashboard-topbar-right">
+              
+              <button id="language-toggle" class="nav-pill-btn" type="button">EN</button>
+              
+              <button id="theme-toggle" class="icon-btn" type="button" aria-label="Theme">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg class="moon-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              </button>
+
+              <div class="user-menu">
+                <button id="user-dropdown-trigger" class="user-badge" type="button">User</button>
+                <div id="user-dropdown" class="dropdown hidden panel-shell">
+                  <button data-profile-action="profile" type="button" class="dropdown-item">Hồ sơ & Bảo mật</button>
+                  <button data-profile-action="switch" type="button" class="dropdown-item">Chuyển tài khoản</button>
+                  <button data-profile-action="logout" type="button" class="dropdown-item danger-text">Đăng xuất</button>
+                </div>
               </div>
             </div>
           </div>
@@ -56,7 +79,7 @@
               <div class="dashboard-home-main">
                 <section class="welcome-card">
                   <h2>Kh&#244;ng gian vi&#7871;t d&#224;nh cho b&#7841;n</h2>
-                  <p>BloomNote gi&#250;p b&#7841;n gi&#7919; nh&#7883;p vi&#7871;t ri&#234;ng t&#432; g&#7885;n g&#224;ng h&#417;n: m&#7903; note nhanh, qu&#7843;n l&#253; tr&#7841;ng th&#225;i m&#227; h&#243;a v&#224; quay l&#7841;i nh&#7919;ng ghi ch&#250; quan tr&#7885;ng b&#7845;t c&#7913; l&#250;c n&#224;o.</p>
+                  <p>NIKKI gi&#250;p b&#7841;n gi&#7919; nh&#7883;p vi&#7871;t ri&#234;ng t&#432; g&#7885;n g&#224;ng h&#417;n: m&#7903; note nhanh, qu&#7843;n l&#253; tr&#7841;ng th&#225;i m&#227; h&#243;a v&#224; quay l&#7841;i nh&#7919;ng ghi ch&#250; quan tr&#7885;ng b&#7845;t c&#7913; l&#250;c n&#224;o.</p>
                   <div class="welcome-actions">
                     <button class="primary-btn" data-screen="notes" type="button">M&#7903; khu nh&#7853;t k&#253;</button>
                     <button class="secondary-btn" data-screen="shared-notes" type="button">Xem chia s&#7867;</button>
@@ -122,7 +145,6 @@
                   <h3>B&#7843;o m&#7853;t c&#225; nh&#226;n</h3>
                   <p>V&#224;o th&#244;ng tin c&#225; nh&#226;n &#273;&#7875; c&#7853;p nh&#7853;t hi&#7875;n th&#7883;, kh&#243;a c&#225; nh&#226;n ho&#7863;c m&#7853;t kh&#7849;u khi c&#7847;n.</p>
                 </section>
-
               </div>
             </div>
           </div>
@@ -273,7 +295,7 @@
 
                 <label class="toolbar-select-label">
                   <span>Highlighter</span>
-                  <input id="shared-highlight-color" type="color" title="&#272;&#225;nh d&#7845;u ch&#7911;" />
+                  <input id="shared-highlight-color" type="color" title="Đánh dấu chữ" />
                 </label>
 
                 <button id="shared-clear-format" type="button" title="X&#243;a &#273;&#7889;nh d&#7841;ng">X&#243;a</button>
@@ -424,10 +446,10 @@
     <div id="profile-access-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h3>M&#7903; th&#244;ng tin c&#225; nh&#226;n</h3>
-        <p>Nh&#7853;p kh&#243;a c&#225; nh&#226;n &#273;&#7875; xem h&#7891; s&#417;. N&#7871;u ch&#432;a &#273;&#7893;i kh&#243;a, m&#7863;c &#273;&#7883;nh kh&#243;a c&#225; nh&#226;n l&#224; m&#7853;t kh&#7849;u t&#224;i kho&#7843;n l&#250;c t&#7841;o.</p>
+        <p>Nh&#7853;p kh&#243;a nh&#7853;t k&#253; &#273;&#7875; xem h&#7891; s&#417;. N&#7871;u ch&#432;a &#273;&#7893;i kh&#243;a, m&#7863;c &#273;&#7883;nh kh&#243;a nh&#7853;t k&#253; l&#224; m&#7853;t kh&#7849;u t&#224;i kho&#7843;n l&#250;c t&#7841;o.</p>
         <div class="field">
-          <label>Kh&#243;a c&#225; nh&#226;n</label>
-          <input id="profile-access-key" type="password" placeholder="Nh&#7853;p kh&#243;a c&#225; nh&#226;n" />
+          <label>Kh&#243;a nh&#7853;t k&#253;</label>
+          <input id="profile-access-key" type="password" placeholder="Nh&#7853;p kh&#243;a nh&#7853;t k&#253;" />
         </div>
         <div class="modal-actions">
           <button id="profile-access-submit" class="primary-btn" type="button">M&#7903; h&#7891; s&#417;</button>
@@ -455,7 +477,7 @@
     <div id="recovery-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h3>C&#7845;p l&#7841;i kh&#243;a</h3>
-        <p>Nh&#7853;p OTP &#273;&#227; g&#7917;i v&#7873; email v&#224; m&#7853;t kh&#7849;u m&#7899;i &#273;&#7875; c&#7845;p l&#7841;i kh&#243;a c&#225; nh&#226;n.</p>
+        <p>Nh&#7853;p OTP &#273;&#227; g&#7917;i v&#7873; email v&#224; m&#7853;t kh&#7849;u m&#7899;i &#273;&#7875; c&#7845;p l&#7841;i kh&#243;a nh&#7853;t k&#253;.</p>
         <div class="field">
           <label>OTP</label>
           <input id="recovery-otp" type="text" maxlength="6" placeholder="Nh&#7853;p m&#227; OTP" />
@@ -481,7 +503,7 @@
             <span>C&#7853;p nh&#7853;t m&#7853;t kh&#7849;u &#273;&#259;ng nh&#7853;p v&#7899;i OTP x&#225;c nh&#7853;n.</span>
           </button>
           <button id="security-option-key" class="security-option-card" type="button">
-            <strong>&#272;&#7893;i kh&#243;a c&#225; nh&#226;n</strong>
+            <strong>&#272;&#7893;i kh&#243;a nh&#7853;t k&#253;</strong>
             <span>Thay kh&#243;a gi&#7843;i m&#227; ghi ch&#250; v&#224; gi&#7919; d&#7919; li&#7879;u an to&#224;n.</span>
           </button>
           <button id="security-option-delete" class="security-option-card danger" type="button">
@@ -520,13 +542,13 @@
 
     <div id="personal-key-modal" class="modal-overlay hidden">
       <div class="modal-card">
-        <h3>&#272;&#7893;i kh&#243;a c&#225; nh&#226;n</h3>
+        <h3>&#272;&#7893;i kh&#243;a nh&#7853;t k&#253;</h3>
         <div class="field">
-          <label>Kh&#243;a c&#225; nh&#226;n hi&#7879;n t&#7841;i</label>
+          <label>Kh&#243;a nh&#7853;t k&#253; hi&#7879;n t&#7841;i</label>
           <input id="profile-current-personal-key" type="password" />
         </div>
         <div class="field">
-          <label>Kh&#243;a c&#225; nh&#226;n m&#7899;i</label>
+          <label>Kh&#243;a nh&#7853;t k&#253; m&#7899;i</label>
           <input id="profile-new-personal-key" type="password" />
         </div>
         <div class="field">
@@ -535,7 +557,7 @@
         </div>
         <div class="modal-actions">
           <button id="request-personal-key-otp" class="secondary-btn" type="button">G&#7917;i OTP</button>
-          <button id="confirm-personal-key" class="primary-btn" type="button">&#272;&#7893;i kh&#243;a c&#225; nh&#226;n</button>
+          <button id="confirm-personal-key" class="primary-btn" type="button">&#272;&#7893;i kh&#243;a nh&#7853;t k&#253;</button>
           <button id="personal-key-close" class="text-btn" type="button">&#272;&#243;ng</button>
         </div>
       </div>
@@ -549,7 +571,7 @@
           <input id="delete-account-password" type="password" />
         </div>
         <div class="field">
-          <label>Kh&#243;a c&#225; nh&#226;n hi&#7879;n t&#7841;i</label>
+          <label>Kh&#243;a nh&#7853;t k&#253; hi&#7879;n t&#7841;i</label>
           <input id="delete-account-personal-key" type="password" />
         </div>
         <div class="field">
@@ -567,10 +589,10 @@
     <div id="notes-unlock-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h3>M&#7903; kh&#243;a nh&#7853;t k&#253;</h3>
-        <p>Nh&#7853;p kh&#243;a c&#225; nh&#226;n &#273;&#7875; &#273;&#7885;c v&#224; ch&#7881;nh s&#7917;a nh&#7853;t k&#253;.</p>
+        <p>Nh&#7853;p kh&#243;a nh&#7853;t k&#253; &#273;&#7875; &#273;&#7885;c v&#224; ch&#7881;nh s&#7917;a nh&#7853;t k&#253;.</p>
         <div class="field">
-          <label>Kh&#243;a c&#225; nh&#226;n</label>
-          <input id="notes-unlock-key" type="password" placeholder="Nh&#7853;p kh&#243;a c&#225; nh&#226;n" />
+          <label>Kh&#243;a nh&#7853;t k&#253;</label>
+          <input id="notes-unlock-key" type="password" placeholder="Nh&#7853;p kh&#243;a nh&#7853;t k&#253;" />
         </div>
         <div class="modal-actions">
           <button id="notes-unlock-confirm" class="primary-btn" type="button">M&#7903; kh&#243;a</button>
@@ -582,10 +604,21 @@
     <div id="share-key-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h3>T&#7841;o link chia s&#7867;</h3>
-        <p>Nh&#7853;p kh&#243;a ki&#7875;m th&#7917; &#273;&#7875; ng&#432;&#7901;i nh&#7853;n d&#249;ng khi m&#7903; ghi ch&#250; &#273;&#432;&#7907;c chia s&#7867;.</p>
+        <p>Ch&#7885;n c&#225;ch chia s&#7867; an to&#224;n cho ghi ch&#250; n&#224;y.</p>
         <div class="field">
-          <label>Kh&#243;a ki&#7875;m th&#7917;</label>
-          <input id="share-test-key" type="password" placeholder="Nh&#7853;p kh&#243;a ki&#7875;m th&#7917;" />
+          <label>Ki&#7875;u m&#227; h&#243;a</label>
+          <select id="share-encryption-type">
+            <option value="symmetric">Symmetric Encryption (Password)</option>
+            <option value="public-key">Public-Key Encryption (Secure Share)</option>
+          </select>
+        </div>
+        <div id="share-symmetric-field" class="field">
+          <label>M&#7853;t kh&#7849;u chia s&#7867;</label>
+          <input id="share-test-key" type="password" placeholder="Nh&#7853;p m&#7853;t kh&#7849;u cho ng&#432;&#7901;i nh&#7853;n" />
+        </div>
+        <div id="share-public-key-field" class="field hidden">
+          <label>Ng&#432;&#7901;i nh&#7853;n</label>
+          <input id="share-recipient-input" type="text" placeholder="Nh&#7853;p username ho&#7863;c email ng&#432;&#7901;i nh&#7853;n" />
         </div>
         <div class="modal-actions">
           <button id="share-key-confirm" class="primary-btn" type="button">T&#7841;o link</button>
@@ -606,6 +639,7 @@
     </div>
 
     <div id="toast" class="toast hidden"></div>
+    <script src="./nikki-security.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

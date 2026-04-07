@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BloomNote</title>
+    <title>NIKKI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,58 +12,113 @@
     />
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
   </head>
   <body data-page="home">
     <div id="app" class="home-splash">
       <header class="home-topbar">
         <div class="home-topbar-left">
-          <button id="brand-home" class="home-logo-btn" type="button" aria-label="BloomNote home">
-            <img src="./images/logo-hub.webp" alt="BloomNote logo" class="home-logo-image" />
+          <button id="brand-home" class="home-logo-btn" type="button" aria-label="NIKKI home">
+            <img src="./images/logo-hub.webp" alt="NIKKI logo" class="home-logo-image" />
           </button>
+          <div class="home-brand-copy">
+            <strong class="home-brand-name">NIKKI</strong>
+          </div>
         </div>
+
         <div class="home-top-actions">
-          <nav class="nav-links home-nav-links">
-            <button data-section="home" class="nav-btn active" type="button">Trang chủ</button>
-            <button data-section="intro" class="nav-btn" type="button">Giới thiệu</button>
-            <button data-section="about" class="nav-btn" type="button">Về chúng tôi</button>
+          <nav class="nav-links home-nav-links" aria-label="Primary navigation">
+            <button data-section="home" class="nav-btn active" type="button">Home</button>
+            <button data-section="features" class="nav-btn" type="button">Features</button>
+            <button data-section="about" class="nav-btn" type="button">About Us</button>
           </nav>
-          <button id="nav-login" class="nav-btn nav-login" type="button">Đăng nhập</button>
+          <button id="nav-login" class="nav-btn nav-login" type="button">Login</button>
           <button id="language-toggle" class="lang-btn" type="button">EN</button>
         </div>
       </header>
 
       <main class="home-splash-main">
-        <section id="home" class="home-splash-hero">
+        <section id="home" class="home-splash-hero landing-section">
           <p id="home-kicker" class="home-splash-kicker"></p>
           <h1 id="home-title" class="home-splash-title"></h1>
           <p id="home-text" class="home-splash-text"></p>
           <div id="hero-tags" class="home-splash-tags"></div>
           <div class="home-splash-actions">
-            <button id="hero-login" class="primary-btn" type="button">Mở khu đăng nhập</button>
+            <button id="hero-login" class="primary-btn" type="button">Login</button>
           </div>
+          <a
+            id="background-credit"
+            class="background-credit"
+            href="https://unsplash.com/photos/d2w-_1LJioQ"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Unsplash</a>
         </section>
 
         <button id="hero-about" class="hidden" type="button" aria-hidden="true"></button>
 
-        <section id="intro" class="landing-section info-section home-info-section">
-          <div class="section-heading">
-            <p id="intro-kicker" class="section-kicker"></p>
-            <h2 id="intro-title"></h2>
-          </div>
-          <div class="info-grid">
-            <article class="info-card panel-shell">
-              <h3 id="intro-card-title-1"></h3>
-              <p id="intro-card-text-1"></p>
-            </article>
-            <article class="info-card panel-shell">
-              <h3 id="intro-card-title-2"></h3>
-              <p id="intro-card-text-2"></p>
-            </article>
-            <article class="info-card panel-shell">
-              <h3 id="intro-card-title-3"></h3>
-              <p id="intro-card-text-3"></p>
-            </article>
-          </div>
+        <section id="features" class="landing-section features-stack">
+          <section class="intro-band panel-shell">
+            <div class="intro-band-copy">
+              <p id="intro-kicker" class="section-kicker"></p>
+              <h2 id="intro-title"></h2>
+              <p id="intro-text-main" class="intro-band-text"></p>
+              <p id="intro-text-sub" class="intro-band-text"></p>
+            </div>
+          </section>
+
+          <section class="showcase-section">
+            <div class="section-heading showcase-heading">
+              <div>
+                <p id="preview-kicker" class="section-kicker"></p>
+                <h2 id="preview-title"></h2>
+              </div>
+              <p id="preview-text" class="section-summary"></p>
+            </div>
+
+            <div class="showcase-slider panel-shell">
+              <div class="showcase-viewport">
+                <div id="showcase-track" class="showcase-track">
+                  <article class="showcase-slide" data-slide="0">
+                    <img src="./images/pic2.jpg" alt="Dashboard feature placeholder 1" class="showcase-image" />
+                    <div class="showcase-overlay">
+                      <span id="preview-label-1" class="preview-label">Overview</span>
+                      <h3 id="preview-card-title-1"></h3>
+                      <p id="preview-card-text-1"></p>
+                    </div>
+                  </article>
+
+                  <article class="showcase-slide" data-slide="1">
+                    <img src="./images/pic2.jpg" alt="Dashboard feature placeholder 2" class="showcase-image" />
+                    <div class="showcase-overlay">
+                      <span id="preview-label-2" class="preview-label">Planning</span>
+                      <h3 id="preview-card-title-2"></h3>
+                      <p id="preview-card-text-2"></p>
+                    </div>
+                  </article>
+
+                  <article class="showcase-slide" data-slide="2">
+                    <img src="./images/pic2.jpg" alt="Dashboard feature placeholder 3" class="showcase-image" />
+                    <div class="showcase-overlay">
+                      <span id="preview-label-3" class="preview-label">Security</span>
+                      <h3 id="preview-card-title-3"></h3>
+                      <p id="preview-card-text-3"></p>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <div class="showcase-controls">
+                <button id="preview-prev" class="carousel-arrow" type="button" aria-label="Previous feature">&#8592;</button>
+                <div class="showcase-dots">
+                  <button class="showcase-dot active" type="button" data-slide-target="0" aria-label="Feature 1"></button>
+                  <button class="showcase-dot" type="button" data-slide-target="1" aria-label="Feature 2"></button>
+                  <button class="showcase-dot" type="button" data-slide-target="2" aria-label="Feature 3"></button>
+                </div>
+                <button id="preview-next" class="carousel-arrow" type="button" aria-label="Next feature">&#8594;</button>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section id="about" class="landing-section about-section home-about-section">
@@ -74,13 +129,56 @@
             </div>
             <p id="about-text" class="about-text"></p>
           </div>
+
           <div class="about-stats">
             <div class="stat-card panel-shell"><strong>01</strong><span id="about-stat-1"></span></div>
             <div class="stat-card panel-shell"><strong>02</strong><span id="about-stat-2"></span></div>
             <div class="stat-card panel-shell"><strong>03</strong><span id="about-stat-3"></span></div>
           </div>
+
+          <div class="team-grid">
+            <article class="team-card panel-shell">
+              <img src="./images/pic2.jpg" alt="Member A avatar" class="team-avatar-image" />
+              <h3>A</h3>
+            </article>
+            <article class="team-card panel-shell">
+              <img src="./images/logo-hub.webp" alt="Member B avatar" class="team-avatar-image" />
+              <h3>B</h3>
+            </article>
+            <article class="team-card panel-shell">
+              <img src="./images/pic2.jpg" alt="Member C avatar" class="team-avatar-image" />
+              <h3>C</h3>
+            </article>
+            <article class="team-card panel-shell">
+              <img src="./images/logo-hub.webp" alt="Member D avatar" class="team-avatar-image" />
+              <h3>D</h3>
+            </article>
+            <article class="team-card panel-shell">
+              <img src="./images/pic2.jpg" alt="Member E avatar" class="team-avatar-image" />
+              <h3>E</h3>
+            </article>
+          </div>
         </section>
       </main>
+
+      <footer id="contact" class="landing-footer">
+        <div class="footer-block">
+          <div class="footer-brand-column">
+            <img src="./images/logo-hub.webp" alt="University logo" class="footer-school-logo" />
+            <div class="footer-address-copy">
+              <p>Đại học Ngân hàng Thành phố Hồ Chí Minh</p>
+              <p>56 Hoàng Diệu 2, Phường Thủ Đức, TP. Hồ Chí Minh</p>
+            </div>
+          </div>
+
+          <div class="footer-contact-column">
+            <p><span id="footer-email-label">Email:</span> <a href="mailto:nikki@gmail.com">nikki@gmail.com</a></p>
+            <p><span id="footer-phone-label">Điện thoại:</span> 0449 - 49348 - 99</p>
+            <p class="footer-about-line"><span id="footer-about-label">Về chúng tôi:</span></p>
+            <p id="footer-about-text" class="footer-about-text"></p>
+          </div>
+        </div>
+      </footer>
     </div>
 
     <div id="toast" class="toast hidden"></div>

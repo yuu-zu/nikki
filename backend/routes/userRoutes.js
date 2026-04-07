@@ -41,6 +41,7 @@ function createUserRoutes({ db }) {
       username: user.username,
       email: user.email,
       displayName: user.displayName || user.username,
+      publicKey: user.publicKey || "",
       birthDate: user.birthDate || "",
       gender: user.gender || "",
       personalKeyHint: user.personalKeyHint || "",
@@ -51,6 +52,64 @@ function createUserRoutes({ db }) {
       accountDeletionExpiresAt: user.accountDeletionExpiresAt || "",
     };
   }
+
+  // ==========================================
+  // API RSA: BƯỚC 2 - LƯU PUBLIC KEY LÊN SERVER
+  // ==========================================
+  router.put("/public-key", async (req, res) => {
+    try {
+      const { publicKey } = req.body;
+      if (!publicKey) {
+        return res.status(400).json({ message: "Public key is required." });
+      }
+
+      // Lưu public key vào document của user hiện tại
+      await db.collection("users").doc(req.user.uid).update({
+        publicKey: publicKey,
+        updatedAt: new Date().toISOString(),
+      });
+
+      return res.json({ message: "Public key updated successfully." });
+    } catch (error) {
+      return res.status(500).json({ message: error.message || "Unable to update public key." });
+    }
+  });
+
+  // ==========================================
+  // API RSA: BƯỚC 3 - LẤY PUBLIC KEY CỦA NGƯỜI KHÁC
+  // ==========================================
+  router.get("/public-key/:identifier", async (req, res) => {
+    try {
+      const { identifier } = req.params; // identifier có thể là username hoặc email
+      const directDoc = await db.collection("users").doc(identifier).get();
+      if (directDoc.exists) {
+        const directUser = directDoc.data();
+        if (!directUser.publicKey) {
+          return res.status(400).json({ message: "Người dùng này chưa thiết lập khóa bảo mật." });
+        }
+        return res.json({ publicKey: directUser.publicKey });
+      }
+
+      let snapshot = await db.collection("users").where("username", "==", identifier).limit(1).get();
+      
+      if (snapshot.empty) {
+        snapshot = await db.collection("users").where("email", "==", identifier).limit(1).get();
+      }
+
+      if (snapshot.empty) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng." });
+      }
+
+      const userData = snapshot.docs[0].data();
+      if (!userData.publicKey) {
+        return res.status(400).json({ message: "Người dùng này chưa thiết lập khóa bảo mật." });
+      }
+
+      return res.json({ publicKey: userData.publicKey });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
 
   router.get("/me", async (req, res) => {
     try {

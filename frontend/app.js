@@ -30,6 +30,7 @@ const state = {
   calendarViewDate: new Date(),
   selectedCalendarDate: new Date().toISOString().split("T")[0],
   calendarNotes: {},
+  rsaPrivateKeyVisible: false,
 };
 
 if (!window.CryptoJS) throw new Error("CryptoJS failed to load. Check your internet connection or CDN access.");
@@ -39,7 +40,7 @@ const translations = {
     nav: { home: "Trang chủ", intro: "Giới thiệu", about: "Về chúng tôi", login: "Đăng nhập" },
     public: {
       homeKicker: "Personal diary space",
-      homeTitle: "BloomNote",
+      homeTitle: "NIKKI",
       homeText: "Không gian nhật ký riêng tư với cảm giác nhẹ nhàng, tập trung và an toàn hơn cho những điều bạn muốn giữ lại.",
       heroAbout: "Khám phá thêm",
       heroLogin: "Mở khu đăng nhập",
@@ -55,7 +56,7 @@ const translations = {
         { title: "Rõ ràng cho người dùng", text: "Trang chủ, giới thiệu, về chúng tôi và khu đăng nhập được tách mạch lạc nhưng vẫn nằm trong cùng một trải nghiệm liền mạch." },
       ],
       aboutKicker: "Về chúng tôi",
-      aboutTitle: "BloomNote được làm ra để việc viết riêng tư trở nên dễ chịu hơn.",
+      aboutTitle: "NIKKI được làm ra để việc viết riêng tư trở nên dễ chịu hơn.",
       aboutText: "Mục tiêu của website là tạo ra một nơi vừa đẹp mắt vừa thực tế để bạn cất giữ câu chuyện cá nhân. Từ phần giới thiệu, đăng nhập đến bảng điều khiển đều được thiết kế để người dùng cảm thấy nhẹ nhàng, dễ dùng và an tâm hơn khi lưu dữ liệu riêng tư.",
       aboutStats: [
         "Tập trung vào cảm giác đọc tiếng Việt rõ ràng, dễ nhìn.",
@@ -66,7 +67,7 @@ const translations = {
     auth: {
       kicker: "Đăng nhập an toàn",
       title: "Bước vào khu nhật ký riêng với cùng cảm giác dịu dàng như trang chủ.",
-      text: "Tại đây bạn vẫn thấy tinh thần của BloomNote, nhưng phần chính sẽ tập trung cho đăng nhập, đăng ký và xác thực OTP.",
+      text: "Tại đây bạn vẫn thấy tinh thần của NIKKI, nhưng phần chính sẽ tập trung cho đăng nhập, đăng ký và xác thực OTP.",
       backHome: "Về trang chủ",
       loginHeading: "Chào mừng bạn quay lại",
       loginIdentifierLabel: "Email / Tên người dùng",
@@ -99,7 +100,7 @@ const translations = {
         notes: ["Nhật ký", "Danh sách giữ nội dung ở dạng mã hóa cho đến khi bạn mở khóa."],
         "shared-notes": ["Nhật ký được chia sẻ", "Quản lý quyền xem, quyền sửa và các nhật ký người khác gửi cho bạn."],
         trash: ["Thùng rác", "Nhật ký đã xóa vẫn được giữ mã hóa trước khi bị xóa hẳn."],
-        profile: ["Thông tin cá nhân", "Cập nhật hồ sơ và khóa cá nhân dùng để giải mã."],
+        profile: ["Thông tin cá nhân", "Cập nhật hồ sơ và khóa nhật ký dùng để giải mã."],
         "share-view": ["Ghi chú được chia sẻ", "Xem bản ghi mã hóa mà bạn đã gửi đi."],
       },
       notesLocked: "Đã khóa",
@@ -133,7 +134,7 @@ const translations = {
       unlockSuccess: "Đã mở khóa nội dung nhật ký.",
       lockSuccess: "Đã ẩn nội dung nhật ký đang hoạt động.",
       needFields: "Vui lòng nhập tiêu đề và nội dung.",
-      needKey: "Cần nhập khóa cá nhân hoặc đăng nhập lại để mã hóa nội dung.",
+      needKey: "Cần nhập khóa nhật ký hoặc đăng nhập lại để mã hóa nội dung.",
       needUnlock: "Hãy mở khóa nhật ký trước khi xem hoặc chỉnh sửa nội dung cũ.",
       shareCreated: "Đã tạo link chia sẻ và copy thông tin.",
       shareRemoved: "Đã xóa nhật ký chia sẻ khỏi danh sách của bạn.",
@@ -145,20 +146,20 @@ const translations = {
       logout: "Đã đăng xuất.",
       sharedLoadError: "Không tải được ghi chú chia sẻ.",
       noNoteToShare: "Hãy mở một nhật ký trước khi chia sẻ.",
-      keyPrompt: "Nhập khóa cá nhân để giải mã nhật ký:",
+      keyPrompt: "Nhập khóa nhật ký để giải mã nhật ký:",
       sharePrompt: "Nhập khóa kiểm thử để gửi kèm:",
       needShareKey: "Bạn cần nhập khóa kiểm thử để tạo link chia sẻ.",
       forgotPrompt: "Nhập email tài khoản:",
       forgotNewPasswordPrompt: "Nhập mật khẩu mới:",
       unlockRequiredForExisting: "Nhật ký cũ đang được giữ ở dạng mã hóa. Mở khóa trước để xem nội dung thật.",
-      invalidKey: "Khóa cá nhân không đúng.",
-      personalKeyOtpSent: "OTP đổi khóa cá nhân đã được gửi về email.",
-      personalKeyUpdated: "Đã đổi khóa cá nhân và mã hóa lại note thành công.",
-      needCurrentPersonalKey: "Bạn cần nhập khóa cá nhân hiện tại.",
-      needNewPersonalKey: "Bạn cần nhập khóa cá nhân mới.",
+      invalidKey: "Khóa nhật ký không đúng.",
+      personalKeyOtpSent: "OTP đổi khóa nhật ký đã được gửi về email.",
+      personalKeyUpdated: "Đã đổi khóa nhật ký và mã hóa lại ghi chú thành công.",
+      needCurrentPersonalKey: "Bạn cần nhập khóa nhật ký hiện tại.",
+      needNewPersonalKey: "Bạn cần nhập khóa nhật ký mới.",
       needCurrentPassword: "Bạn cần nhập mật khẩu hiện tại.",
       needOtp: "Bạn cần nhập OTP xác nhận đổi khóa.",
-      needUnlockBeforeChange: "Hãy mở khóa toàn bộ note hiện tại trước khi đổi khóa cá nhân.",
+      needUnlockBeforeChange: "Hãy mở khóa toàn bộ ghi chú hiện tại trước khi đổi khóa nhật ký.",
       needUnlockBeforePasswordChange: "Hãy mở khóa toàn bộ note hiện tại trước khi đổi mật khẩu.",
       passwordChangeReencryptFailed: "Không thể đồng bộ note sang mật khẩu mới. Hãy mở khóa lại note hiện tại và thử lại.",
       sharedUnlockFailed: "Khóa kiểm thử không đúng hoặc nội dung không thể giải mã.",
@@ -166,16 +167,16 @@ const translations = {
       shareInfo: "Mỗi lần chia sẻ sẽ tạo một link mới và yêu cầu một khóa kiểm thử mới.",
       encryptedTitle: "Ghi chú đang mã hóa",
       searchPlaceholder: "Tìm theo tiêu đề sau khi mở khóa...",
-      needProfileKey: "Bạn cần nhập khóa cá nhân để mở hồ sơ.",
+      needProfileKey: "Bạn cần nhập khóa nhật ký để mở hồ sơ.",
       profileAccessOtpSent: "OTP mở hồ sơ đã được gửi về email.",
       profileAccessGranted: "Đã mở trang thông tin cá nhân.",
-      recoveryOtpSent: "OTP cấp lại khóa đã được gửi về email.",
-      recoverySuccess: "Đã cấp lại khóa và đổi mật khẩu mới thành công.",
+      recoveryOtpSent: "OTP cấp lại khóa nhật ký đã được gửi về email.",
+      recoverySuccess: "Đã cấp lại khóa nhật ký và đổi mật khẩu mới thành công.",
       passwordOtpSent: "OTP đổi mật khẩu đã được gửi về email.",
       passwordUpdated: "Đã đổi mật khẩu đăng nhập thành công.",
       accountDeleteOtpSent: "OTP xóa tài khoản đã được gửi về email.",
       accountDeleted: "Tài khoản đã được đưa vào thùng rác 30 ngày.",
-      needDeleteFields: "Bạn cần nhập mật khẩu hiện tại, khóa cá nhân hiện tại và OTP.",
+      needDeleteFields: "Bạn cần nhập mật khẩu hiện tại, khóa nhật ký hiện tại và OTP.",
       needPasswordFields: "Bạn cần nhập mật khẩu mới và OTP.",
       calendarLocked: "Lịch đang bị khóa. Mở khóa nhật ký để xem lịch.",
       apiJsonError: "API trả về dữ liệu không hợp lệ. Vui lòng thử lại.",
@@ -185,7 +186,7 @@ const translations = {
     nav: { home: "Home", intro: "Introduction", about: "About", login: "Login" },
     public: {
       homeKicker: "Personal diary space",
-      homeTitle: "BloomNote",
+      homeTitle: "NIKKI",
       homeText: "A private diary space with a calmer atmosphere for writing, keeping, and protecting your personal thoughts.",
       heroAbout: "Explore more",
       heroLogin: "Open login area",
@@ -201,7 +202,7 @@ const translations = {
         { title: "Clear for users", text: "Home, introduction, about, and login are separated cleanly while still feeling like one continuous product experience." },
       ],
       aboutKicker: "About us",
-      aboutTitle: "BloomNote was built to make private writing feel calmer.",
+      aboutTitle: "NIKKI was built to make private writing feel calmer.",
       aboutText: "The website aims to give you a place that is both beautiful and practical for personal stories. From the landing sections to the login area and dashboard, everything is shaped to feel softer, easier, and safer.",
       aboutStats: [
         "Focused on clear, comfortable reading.",
@@ -212,7 +213,7 @@ const translations = {
     auth: {
       kicker: "Secure login",
       title: "Step into your private diary with the same atmosphere as the home page.",
-      text: "This view keeps BloomNote's identity while focusing on sign in, sign up, and OTP verification.",
+      text: "This view keeps NIKKI's identity while focusing on sign in, sign up, and OTP verification.",
       backHome: "Back to home",
       loginHeading: "Welcome back",
       loginIdentifierLabel: "Email / Username",
@@ -245,7 +246,7 @@ const translations = {
         notes: ["Diary", "Entries stay encrypted until you choose to unlock them."],
         "shared-notes": ["Shared diary", "Manage access permissions and notes shared with you."],
         trash: ["Trash", "Deleted entries remain encrypted before permanent cleanup."],
-        profile: ["Profile", "Update your profile and personal decryption key."],
+        profile: ["Profile", "Update your profile and journal key used for decryption."],
         "share-view": ["Shared note", "View the encrypted note you shared."],
       },
       notesLocked: "Locked",
@@ -279,53 +280,244 @@ const translations = {
       unlockSuccess: "Diary content unlocked.",
       lockSuccess: "Active diary content hidden again.",
       needFields: "Please enter both title and content.",
-      needKey: "A personal key or a fresh login is required to encrypt content.",
+      needKey: "A journal key or a fresh login is required to encrypt content.",
       needUnlock: "Unlock the diary before viewing or editing older entries.",
       shareCreated: "Share link created and copied.",
       shareRemoved: "The shared note was removed from your list.",
       shareStopped: "Sharing for this note has been stopped.",
       shareUpdated: "Share access updated.",
       shareSaved: "Shared note changes saved.",
-      needRecipient: "A recipient account is required for edit access.",
+      needRecipient: "A recipient account is required to generate the encryption keys.",
       switchAccount: "Please sign in to a different account.",
       logout: "Logged out.",
       sharedLoadError: "Unable to load the shared note.",
       noNoteToShare: "Open a diary entry before sharing it.",
-      keyPrompt: "Enter your personal key to decrypt diary entries:",
+      keyPrompt: "Enter your journal key to decrypt diary entries:",
       sharePrompt: "Enter the test key to include:",
       needShareKey: "Enter a test key before creating a share link.",
       forgotPrompt: "Enter your account email:",
       forgotNewPasswordPrompt: "Enter your new password:",
       unlockRequiredForExisting: "Existing diary entries remain encrypted until you unlock them.",
-      invalidKey: "The personal key is incorrect.",
-      personalKeyOtpSent: "The personal key OTP has been sent to your email.",
-      personalKeyUpdated: "The personal key was updated and notes were re-encrypted successfully.",
-      needCurrentPersonalKey: "You need to enter your current personal key.",
-      needNewPersonalKey: "You need to enter a new personal key.",
+      invalidKey: "The journal key is incorrect.",
+      personalKeyOtpSent: "The journal key OTP has been sent to your email.",
+      personalKeyUpdated: "The journal key was updated and notes were re-encrypted successfully.",
+      needCurrentPersonalKey: "You need to enter your current journal key.",
+      needNewPersonalKey: "You need to enter a new journal key.",
       needCurrentPassword: "You need to enter your current password.",
       needOtp: "You need to enter the OTP confirmation code.",
-      needUnlockBeforeChange: "Unlock your current notes before changing the personal key.",
+      needUnlockBeforeChange: "Unlock your current notes before changing the journal key.",
       needUnlockBeforePasswordChange: "Unlock your current notes before changing the password.",
       passwordChangeReencryptFailed: "Current notes could not be synced to the new password. Unlock them again and try once more.",
       sharedUnlockFailed: "The test key is incorrect or the content could not be decrypted.",
       sharedUnlockSuccess: "The shared note has been unlocked.",
-      shareInfo: "Each share generates a new link and requires a new test key.",
+      shareInfo: "Each share is automatically protected with Hybrid RSA and AES encryption.",
       encryptedTitle: "Encrypted note",
       searchPlaceholder: "Search titles after unlocking...",
-      needProfileKey: "You need to enter the personal key to open the profile.",
+      needProfileKey: "You need to enter the journal key to open the profile.",
       profileAccessOtpSent: "The profile access OTP has been sent to your email.",
       profileAccessGranted: "The profile page is now unlocked.",
-      recoveryOtpSent: "The recovery OTP has been sent to your email.",
-      recoverySuccess: "Your key was reissued and password updated successfully.",
+      recoveryOtpSent: "The journal key recovery OTP has been sent to your email.",
+      recoverySuccess: "Your journal key was reissued and your password was updated successfully.",
       passwordOtpSent: "The password change OTP has been sent to your email.",
       passwordUpdated: "The login password has been updated successfully.",
       accountDeleteOtpSent: "The account deletion OTP has been sent to your email.",
       accountDeleted: "The account has been moved to trash for 30 days.",
-      needDeleteFields: "Enter your current password, current personal key, and OTP.",
+      needDeleteFields: "Enter your current password, current journal key, and OTP.",
       needPasswordFields: "Enter the new password and OTP.",
       calendarLocked: "Calendar is locked. Unlock diary to view calendar.",
       apiJsonError: "The API returned an invalid response. Please try again.",
     },
+  },
+};
+
+const BRAND_NAME = "NIKKI";
+
+translations.vi.nav = {
+  home: "Trang chủ",
+  intro: "Tính năng",
+  about: "Về chúng tôi",
+  login: "Đăng nhập",
+};
+
+translations.en.nav = {
+  home: "Home",
+  intro: "Features",
+  about: "About Us",
+  login: "Login",
+};
+
+Object.assign(translations.vi.public, {
+  homeTitle: BRAND_NAME,
+  homeKicker: "Không gian nhật ký hiện đại",
+  homeText:
+    "NIKKI là nơi giúp bạn ghi lại suy nghĩ, quản lý ghi chú và cảm nhận rõ giá trị của sản phẩm ngay từ trang đầu tiên trước khi đăng nhập.",
+  heroLogin: "Đăng nhập",
+  tags: ["Giao diện hiện đại", "Chuyển động mượt", "Nhật ký riêng tư"],
+  introKicker: "Tính năng",
+  introTitle: "Trang giới thiệu trước khi đăng nhập mang phong cách sản phẩm công nghệ hiện đại.",
+  introCards: [
+    {
+      title: "Điểm bắt đầu rõ ràng",
+      text: "Người dùng chưa đăng nhập sẽ vào trang giới thiệu thay vì đi thẳng vào bảng điều khiển.",
+    },
+    {
+      title: "Trình chiếu tính năng",
+      text: "Ảnh màn hình bảng điều khiển được đặt trong một thanh trượt ngang duy nhất với chuyển động mượt.",
+    },
+    {
+      title: "Bố cục gọn gàng",
+      text: "Thanh điều hướng, phần giới thiệu nhóm và chân trang được sắp xếp rõ ràng, dễ nhìn và cân đối.",
+    },
+  ],
+  aboutKicker: "Về chúng tôi",
+  aboutTitle: "NIKKI được xây dựng để việc viết và quản lý nhật ký trở nên trực quan hơn.",
+  aboutText:
+    "Trang giới thiệu mới tập trung vào trải nghiệm rõ ràng, khoảng trắng đẹp và các khối nội dung cân đối để người dùng hiểu sản phẩm trước khi sử dụng bảng điều khiển.",
+  aboutStats: [
+    "Điều hướng luôn hiển thị khi cuộn trang.",
+    "Trình chiếu ngang giúp giới thiệu nhanh các màn hình bảng điều khiển.",
+    "Giao diện đáp ứng tốt trên cả máy tính và điện thoại.",
+  ],
+});
+
+Object.assign(translations.en.public, {
+  homeTitle: BRAND_NAME,
+  homeKicker: "Modern journaling product",
+  homeText:
+    "NIKKI helps users understand the product before login through a polished landing page with clear structure, refined motion, and a focused private-journal message.",
+  heroLogin: "Login",
+  tags: ["Modern interface", "Smooth motion", "Private journaling"],
+  introKicker: "Features",
+  introTitle: "A pre-login landing page with the feel of a modern technology product.",
+  introCards: [
+    {
+      title: "A clearer entry point",
+      text: "Logged-out users now land on a homepage instead of being sent directly to the dashboard.",
+    },
+    {
+      title: "A feature carousel",
+      text: "Dashboard screenshots live inside one horizontal slider with smooth transitions and focused presentation.",
+    },
+    {
+      title: "A cleaner layout",
+      text: "Navigation, team introduction, and footer sections are spaced and balanced like a polished product site.",
+    },
+  ],
+  aboutKicker: "About Us",
+  aboutTitle: "NIKKI is designed to make journaling and note management feel more intuitive.",
+  aboutText:
+    "The refreshed landing page focuses on clarity, generous spacing, and balanced content blocks so visitors understand the product before entering the dashboard.",
+  aboutStats: [
+    "The navigation bar stays visible while scrolling.",
+    "A single horizontal slider introduces key dashboard screens.",
+    "The layout adapts cleanly across desktop and mobile sizes.",
+  ],
+});
+
+Object.assign(translations.vi.auth, {
+  title: "Đăng nhập vào NIKKI để tiếp tục sử dụng bảng điều khiển hiện có.",
+  text: "Luồng đăng nhập và chức năng bảng điều khiển được giữ nguyên. Người dùng chưa đăng nhập sẽ thấy trang giới thiệu trước.",
+  tags: ["Đăng nhập an toàn", "Giữ nguyên chức năng", "Kết nối liền mạch"],
+});
+
+Object.assign(translations.en.auth, {
+  title: "Log in to NIKKI to continue using the existing dashboard.",
+  text: "The authentication flow and dashboard functionality stay intact. Logged-out users now see the landing page first.",
+  tags: ["Secure access", "Existing dashboard", "Seamless flow"],
+});
+
+Object.assign(translations.vi.dashboard.screens, {
+  profile: ["Thông tin cá nhân", "Cập nhật hồ sơ và khóa nhật ký dùng để giải mã."],
+});
+
+Object.assign(translations.en.dashboard.screens, {
+  profile: ["Profile", "Update your profile and journal key used for decryption."],
+});
+
+Object.assign(translations.vi.toasts, {
+  needKey: "Cần nhập khóa nhật ký hoặc đăng nhập lại để mã hóa nội dung.",
+  keyPrompt: "Nhập khóa nhật ký để giải mã nhật ký:",
+  invalidKey: "Khóa nhật ký không đúng.",
+  personalKeyOtpSent: "OTP đổi khóa nhật ký đã được gửi về email.",
+  personalKeyUpdated: "Đã đổi khóa nhật ký và mã hóa lại ghi chú thành công.",
+  needCurrentPersonalKey: "Bạn cần nhập khóa nhật ký hiện tại.",
+  needNewPersonalKey: "Bạn cần nhập khóa nhật ký mới.",
+  needUnlockBeforeChange: "Hãy mở khóa toàn bộ ghi chú hiện tại trước khi đổi khóa nhật ký.",
+  needProfileKey: "Bạn cần nhập khóa nhật ký để mở hồ sơ.",
+  recoveryOtpSent: "OTP cấp lại khóa nhật ký đã được gửi về email.",
+  recoverySuccess: "Đã cấp lại khóa nhật ký và đổi mật khẩu mới thành công.",
+  needDeleteFields: "Bạn cần nhập mật khẩu hiện tại, khóa nhật ký hiện tại và OTP.",
+});
+
+Object.assign(translations.en.toasts, {
+  needKey: "A journal key or a fresh login is required to encrypt content.",
+  keyPrompt: "Enter your journal key to decrypt diary entries:",
+  invalidKey: "The journal key is incorrect.",
+  personalKeyOtpSent: "The journal key OTP has been sent to your email.",
+  personalKeyUpdated: "The journal key was updated and notes were re-encrypted successfully.",
+  needCurrentPersonalKey: "You need to enter your current journal key.",
+  needNewPersonalKey: "You need to enter a new journal key.",
+  needUnlockBeforeChange: "Unlock your current notes before changing the journal key.",
+  needProfileKey: "You need to enter the journal key to open the profile.",
+  recoveryOtpSent: "The journal key recovery OTP has been sent to your email.",
+  recoverySuccess: "Your journal key was reissued and your password was updated successfully.",
+  needDeleteFields: "Enter your current password, current journal key, and OTP.",
+});
+
+const landingContent = {
+  vi: {
+    introTextMain:
+      "NIKKI mở đầu bằng một phần giới thiệu ngắn gọn để người dùng hiểu ngay sản phẩm đang làm gì, dành cho ai và vì sao nên đăng nhập để tiếp tục sử dụng.",
+    introTextSub:
+      "Ngay bên dưới là thanh trượt ngang duy nhất dùng ảnh mẫu trong dự án để giới thiệu các khu vực chính của bảng điều khiển bằng chuyển động mượt và hiện đại.",
+    previewKicker: "Giới thiệu tính năng",
+    previewTitle: "Thanh trượt ngang giúp xem nhanh các màn hình nổi bật của bảng điều khiển.",
+    previewText:
+      "Mỗi lần bấm mũi tên, ảnh sẽ trượt sang mục tiếp theo. Tại một thời điểm chỉ có một ảnh chính được hiển thị rõ ràng.",
+    previewLabels: ["Tổng quan", "Lập kế hoạch", "Bảo mật"],
+    previewTitles: [
+      "Bảng điều khiển tổng quan để xem nhanh ghi chú, hoạt động gần đây và các lối tắt quan trọng.",
+      "Khu vực hỗ trợ theo dõi lịch và tổ chức công việc hằng ngày gọn gàng hơn.",
+      "Màn hình quản lý hồ sơ và quyền riêng tư để kiểm soát tài khoản an toàn hơn.",
+    ],
+    previewTexts: [
+      "Ảnh mẫu này có thể được thay bằng ảnh chụp bảng điều khiển thật sau này.",
+      "Tất cả ảnh đều nằm trong cùng một thanh trượt thay vì tách thành nhiều phần riêng.",
+      "Phần giới thiệu này nhấn mạnh khả năng bảo mật và quản lý tài khoản của sản phẩm.",
+    ],
+    backgroundCredit: "Nguồn ảnh nền: Unsplash",
+    footerEmailLabel: "Email:",
+    footerPhoneLabel: "Điện thoại:",
+    footerAboutLabel: "Về chúng tôi:",
+    footerAboutText:
+      "Nhóm xây dựng NIKKI với mục tiêu tạo ra một không gian nhật ký riêng tư, gọn gàng và dễ tiếp cận hơn cho người dùng.",
+  },
+  en: {
+    introTextMain:
+      "NIKKI opens with a concise introduction that explains what the product does, who it serves, and why the dashboard matters before the user logs in.",
+    introTextSub:
+      "Right below it, one horizontal slider uses placeholder images from the project to showcase the key dashboard areas with smooth modern motion.",
+    previewKicker: "Feature Introduction",
+    previewTitle: "A horizontal slider for a quick tour of the most important dashboard views.",
+    previewText:
+      "Each arrow click moves to the next feature smoothly, while keeping a single main image in focus at any moment.",
+    previewLabels: ["Overview", "Planning", "Security"],
+    previewTitles: [
+      "A main overview screen for notes, recent activity, and important shortcuts.",
+      "A planning-focused area that supports calendar visibility and daily organization.",
+      "A profile and privacy area for safer account and access management.",
+    ],
+    previewTexts: [
+      "This placeholder image can be replaced later with a real dashboard screenshot.",
+      "All feature images stay inside one slider instead of becoming separate full sections.",
+      "This feature highlight reinforces the product's privacy and account-control story.",
+    ],
+    backgroundCredit: "Background source: Unsplash",
+    footerEmailLabel: "Email:",
+    footerPhoneLabel: "Phone:",
+    footerAboutLabel: "About Us:",
+    footerAboutText:
+      "The team built NIKKI to create a cleaner, more approachable, and more private journaling experience for users.",
   },
 };
 
@@ -352,12 +544,36 @@ const els = {
   introCardText2: byId("intro-card-text-2"),
   introCardTitle3: byId("intro-card-title-3"),
   introCardText3: byId("intro-card-text-3"),
+  introTextMain: byId("intro-text-main"),
+  introTextSub: byId("intro-text-sub"),
   aboutKicker: byId("about-kicker"),
   aboutTitle: byId("about-title"),
   aboutText: byId("about-text"),
   aboutStat1: byId("about-stat-1"),
   aboutStat2: byId("about-stat-2"),
   aboutStat3: byId("about-stat-3"),
+  previewKicker: byId("preview-kicker"),
+  previewTitle: byId("preview-title"),
+  previewText: byId("preview-text"),
+  previewLabel1: byId("preview-label-1"),
+  previewLabel2: byId("preview-label-2"),
+  previewLabel3: byId("preview-label-3"),
+  previewCardTitle1: byId("preview-card-title-1"),
+  previewCardTitle2: byId("preview-card-title-2"),
+  previewCardTitle3: byId("preview-card-title-3"),
+  previewCardText1: byId("preview-card-text-1"),
+  previewCardText2: byId("preview-card-text-2"),
+  previewCardText3: byId("preview-card-text-3"),
+  backgroundCredit: byId("background-credit"),
+  footerEmailLabel: byId("footer-email-label"),
+  footerPhoneLabel: byId("footer-phone-label"),
+  footerAboutLabel: byId("footer-about-label"),
+  footerAboutText: byId("footer-about-text"),
+  previewPrev: byId("preview-prev"),
+  previewNext: byId("preview-next"),
+  showcaseTrack: byId("showcase-track"),
+  showcaseSlides: Array.from(document.querySelectorAll(".showcase-slide")),
+  showcaseDots: Array.from(document.querySelectorAll(".showcase-dot")),
   authKicker: byId("auth-kicker"),
   authTitle: byId("auth-title"),
   authText: byId("auth-text"),
@@ -438,6 +654,13 @@ const els = {
   profileBirthDate: byId("profile-birth-date"),
   profileEmail: byId("profile-email"),
   profileGender: byId("profile-gender"),
+  rsaKeyStatus: byId("rsa-key-status"),
+  securityPublicKey: byId("security-public-key"),
+  securityPrivateKey: byId("security-private-key"),
+  showPrivateKey: byId("show-private-key"),
+  copyPrivateKey: byId("copy-private-key"),
+  downloadPrivateKey: byId("download-private-key"),
+  regenerateKeyPair: byId("regenerate-key-pair"),
   profileNewPersonalKey: byId("profile-new-personal-key"),
   profilePersonalKeyOtp: byId("profile-personal-key-otp"),
   saveProfile: byId("save-profile"),
@@ -489,7 +712,11 @@ const els = {
   notesUnlockConfirm: byId("notes-unlock-confirm"),
   notesUnlockClose: byId("notes-unlock-close"),
   shareKeyModal: byId("share-key-modal"),
+  shareEncryptionType: byId("share-encryption-type"),
+  shareSymmetricField: byId("share-symmetric-field"),
+  sharePublicKeyField: byId("share-public-key-field"),
   shareTestKey: byId("share-test-key"),
+  shareRecipientInput: byId("share-recipient-input"),
   shareKeyConfirm: byId("share-key-confirm"),
   shareKeyClose: byId("share-key-close"),
   toast: byId("toast"),
@@ -524,11 +751,48 @@ const els = {
 
 function t() { return translations[state.language]; }
 function escapeHtml(value = "") { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;"); }
+let loadingCount = 0;
+
+function ensureLoadingOverlay() {
+  let overlay = byId("loading-overlay");
+  if (overlay) return overlay;
+
+  overlay = document.createElement("div");
+  overlay.id = "loading-overlay";
+  overlay.className = "loading-overlay hidden";
+  overlay.innerHTML = `
+    <div class="loading-card">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p id="loading-text" class="loading-text"></p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function syncLoadingText() {
+  const loadingText = byId("loading-text");
+  if (loadingText) loadingText.textContent = state.language === "vi" ? "Đang tải..." : "Loading...";
+}
+
+function startLoading() {
+  loadingCount += 1;
+  const overlay = ensureLoadingOverlay();
+  syncLoadingText();
+  overlay.classList.remove("hidden");
+}
+
+function stopLoading() {
+  loadingCount = Math.max(0, loadingCount - 1);
+  const overlay = ensureLoadingOverlay();
+  if (loadingCount === 0) overlay.classList.add("hidden");
+}
+
 function showToast(message) {
   if (!els.toast) return;
   els.toast.textContent = message;
   els.toast.classList.remove("hidden");
-  setTimeout(() => els.toast && els.toast.classList.add("hidden"), 2500);
+  setTimeout(() => els.toast && els.toast.classList.add("hidden"), 3000);
 }
 
 function getCalendarStorageKey() {
@@ -569,7 +833,6 @@ function renderCalendarWidget() {
   if (!els.calendarGrid || !els.calendarMonthLabel || !els.calendarSelectedDate || !els.calendarNoteInput) return;
 
   if (!state.notesUnlocked) {
-    // Show locked message
     els.calendarMonthLabel.textContent = t().toasts.needUnlock;
     els.calendarGrid.innerHTML = `<div class="calendar-locked">${t().toasts.calendarLocked}</div>`;
     els.calendarSelectedDate.textContent = "";
@@ -619,6 +882,49 @@ function renderCalendarWidget() {
   }));
 }
 function renderTagList(container, items) { if (container) container.innerHTML = items.map((item) => `<span>${escapeHtml(item)}</span>`).join(""); }
+let homeShowcaseIndex = 0;
+
+function renderLandingExtras() {
+  const copy = landingContent[state.language];
+  if (!copy) return;
+  if (els.introTextMain) els.introTextMain.textContent = copy.introTextMain;
+  if (els.introTextSub) els.introTextSub.textContent = copy.introTextSub;
+  if (els.previewKicker) els.previewKicker.textContent = copy.previewKicker;
+  if (els.previewTitle) els.previewTitle.textContent = copy.previewTitle;
+  if (els.previewText) els.previewText.textContent = copy.previewText;
+  if (els.previewLabel1) els.previewLabel1.textContent = copy.previewLabels[0];
+  if (els.previewLabel2) els.previewLabel2.textContent = copy.previewLabels[1];
+  if (els.previewLabel3) els.previewLabel3.textContent = copy.previewLabels[2];
+  if (els.previewCardTitle1) els.previewCardTitle1.textContent = copy.previewTitles[0];
+  if (els.previewCardTitle2) els.previewCardTitle2.textContent = copy.previewTitles[1];
+  if (els.previewCardTitle3) els.previewCardTitle3.textContent = copy.previewTitles[2];
+  if (els.previewCardText1) els.previewCardText1.textContent = copy.previewTexts[0];
+  if (els.previewCardText2) els.previewCardText2.textContent = copy.previewTexts[1];
+  if (els.previewCardText3) els.previewCardText3.textContent = copy.previewTexts[2];
+  if (els.backgroundCredit) els.backgroundCredit.textContent = copy.backgroundCredit;
+  if (els.footerEmailLabel) els.footerEmailLabel.textContent = copy.footerEmailLabel;
+  if (els.footerPhoneLabel) els.footerPhoneLabel.textContent = copy.footerPhoneLabel;
+  if (els.footerAboutLabel) els.footerAboutLabel.textContent = copy.footerAboutLabel;
+  if (els.footerAboutText) els.footerAboutText.textContent = copy.footerAboutText;
+}
+
+function renderHomeShowcase(index = 0) {
+  if (!els.showcaseSlides.length) return;
+  const maxIndex = els.showcaseSlides.length - 1;
+  homeShowcaseIndex = index < 0 ? maxIndex : index > maxIndex ? 0 : index;
+  if (els.showcaseTrack) els.showcaseTrack.style.transform = `translateX(-${homeShowcaseIndex * 100}%)`;
+  els.showcaseSlides.forEach((slide, slideIndex) => slide.classList.toggle("active", slideIndex === homeShowcaseIndex));
+  els.showcaseDots.forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === homeShowcaseIndex));
+}
+
+function initHomeShowcase() {
+  if (!els.showcaseSlides.length) return;
+  renderHomeShowcase(homeShowcaseIndex);
+  on(els.previewPrev, "click", () => renderHomeShowcase(homeShowcaseIndex - 1));
+  on(els.previewNext, "click", () => renderHomeShowcase(homeShowcaseIndex + 1));
+  els.showcaseDots.forEach((dot) => on(dot, "click", () => renderHomeShowcase(Number(dot.dataset.slideTarget || 0))));
+}
+
 function goToHome(section = "") { window.location.href = `/index.html${section ? `#${section}` : ""}`; }
 function goToLogin(newTab = false) {
   const targetUrl = "/login.html";
@@ -652,12 +958,14 @@ function renderMarketingContent() {
   const copy = t();
   document.documentElement.lang = state.language;
   localStorage.setItem("diaryLanguage", state.language);
+  syncLoadingText();
   if (els.languageToggle) els.languageToggle.textContent = state.language === "vi" ? "EN" : "VN";
-  if (els.navButtons.length >= 3) {
-    els.navButtons[0].textContent = copy.nav.home;
-    els.navButtons[1].textContent = copy.nav.intro;
-    els.navButtons[2].textContent = copy.nav.about;
-  }
+  els.navButtons.forEach((button) => {
+    const section = button.dataset.section;
+    if (section === "home") button.textContent = copy.nav.home;
+    if (section === "features" || section === "intro") button.textContent = copy.nav.intro;
+    if (section === "about") button.textContent = copy.nav.about;
+  });
   if (els.navLogin) els.navLogin.textContent = copy.nav.login;
   if (els.homeKicker) els.homeKicker.textContent = copy.public.homeKicker;
   if (els.homeTitle) els.homeTitle.textContent = copy.public.homeTitle;
@@ -682,6 +990,7 @@ function renderMarketingContent() {
   if (els.aboutStat1) els.aboutStat1.textContent = copy.public.aboutStats[0];
   if (els.aboutStat2) els.aboutStat2.textContent = copy.public.aboutStats[1];
   if (els.aboutStat3) els.aboutStat3.textContent = copy.public.aboutStats[2];
+  renderLandingExtras();
   if (page === "login") {
     if (els.authKicker) els.authKicker.textContent = copy.auth.kicker;
     if (els.authTitle) els.authTitle.textContent = copy.auth.title;
@@ -731,24 +1040,167 @@ function toggleAuthCard(target) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(`/api${path}`, {
-    headers: { "Content-Type": "application/json", ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}), ...(options.headers || {}) },
-    ...options,
-  });
-  if (response.status === 401 && page === "dashboard") {
-    clearSession();
-    goToHome();
-    throw new Error("Unauthorized");
+  startLoading();
+  try {
+    const response = await fetch(`/api${path}`, {
+      headers: { "Content-Type": "application/json", ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}), ...(options.headers || {}) },
+      ...options,
+    });
+    if (response.status === 401 && page === "dashboard") {
+      clearSession();
+      goToHome();
+      throw new Error("Unauthorized");
+    }
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const text = await response.text();
+      const line = text.trim().split("\n")[0] || "";
+      throw new Error(line.startsWith("<") ? t().toasts.apiJsonError : line || t().toasts.apiJsonError);
+    }
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Request failed.");
+    return data;
+  } finally {
+    stopLoading();
   }
-  const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await response.text();
-    const line = text.trim().split("\n")[0] || "";
-    throw new Error(line.startsWith("<") ? t().toasts.apiJsonError : line || t().toasts.apiJsonError);
+}
+
+// API Hỗ trợ lấy Public Key của người khác
+async function getRecipientPublicKey(identifier) {
+  const data = await api(`/user/public-key/${encodeURIComponent(identifier)}`);
+  return data.publicKey;
+}
+
+function getStoredPrivateKey() {
+  return state.user?.uid ? window.NikkiSecurity?.getPrivateKey(state.user.uid) || "" : "";
+}
+
+function getMaskedPrivateKey(privateKey = "") {
+  if (!privateKey) return "";
+  const lines = privateKey.split("\n");
+  return lines.map((line, index) => {
+    if (index === 0 || index === lines.length - 1) return line;
+    return line ? "•".repeat(Math.max(16, line.length)) : "";
+  }).join("\n");
+}
+
+function updateSecurityKeyUI() {
+  if (!els.securityPublicKey || !els.securityPrivateKey || !els.rsaKeyStatus) return;
+  const publicKey = state.user?.publicKey || "";
+  const privateKey = getStoredPrivateKey();
+  const hasKeyPair = Boolean(publicKey && privateKey);
+
+  els.rsaKeyStatus.textContent = hasKeyPair ? "Key pair ready" : "No key pair";
+  els.securityPublicKey.value = publicKey;
+  els.securityPrivateKey.value = state.rsaPrivateKeyVisible ? privateKey : getMaskedPrivateKey(privateKey);
+  els.securityPrivateKey.classList.toggle("is-visible", state.rsaPrivateKeyVisible);
+  if (els.showPrivateKey) {
+    els.showPrivateKey.textContent = state.rsaPrivateKeyVisible ? "Hide Private Key" : "Show Private Key";
   }
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Request failed.");
-  return data;
+}
+
+async function ensureUserKeyPair(forceRegenerate = false) {
+  if (!state.user?.uid || !window.NikkiSecurity) return null;
+  const result = await window.NikkiSecurity.ensureKeyPairForUser(
+    state.user,
+    async (publicKey) => {
+      await api("/user/public-key", {
+        method: "PUT",
+        body: JSON.stringify({ publicKey }),
+      });
+      state.user = { ...state.user, publicKey };
+      localStorage.setItem("diaryUser", JSON.stringify(state.user));
+    },
+    forceRegenerate
+  );
+  updateSecurityKeyUI();
+  return result;
+}
+
+async function decryptDiaryPayload(encryptedContent) {
+  const privateKey = getStoredPrivateKey();
+  const encryptionType = window.NikkiSecurity?.detectEncryptionType(encryptedContent) || "";
+  if (!privateKey || !encryptedContent || !window.NikkiSecurity || encryptionType !== "public-key") return "";
+
+  try {
+    return await window.NikkiSecurity.decryptContentWithPrivateKey(encryptedContent, privateKey);
+  } catch {
+    return "";
+  }
+}
+
+function detectShareEncryptionType(payload, explicitType = "") {
+  return explicitType || window.NikkiSecurity?.detectEncryptionType(payload) || "";
+}
+
+async function decryptSharedPayload(sharedPayload, password = "") {
+  const encryptionType = detectShareEncryptionType(sharedPayload?.encryptedContent, sharedPayload?.encryptionType);
+  if (!sharedPayload?.encryptedContent || !encryptionType || !window.NikkiSecurity) return "";
+
+  try {
+    if (encryptionType === "public-key") {
+      const privateKey = getStoredPrivateKey();
+      if (!privateKey) return "";
+      return await window.NikkiSecurity.decryptContentWithPrivateKey(sharedPayload.encryptedContent, privateKey);
+    }
+
+    if (encryptionType === "symmetric") {
+      if (!password) return "";
+      return await window.NikkiSecurity.decryptContentWithPassword(sharedPayload.encryptedContent, password);
+    }
+
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+function updateShareModalFields() {
+  const encryptionType = els.shareEncryptionType?.value || "symmetric";
+  if (els.shareSymmetricField) els.shareSymmetricField.classList.toggle("hidden", encryptionType !== "symmetric");
+  if (els.sharePublicKeyField) els.sharePublicKeyField.classList.toggle("hidden", encryptionType !== "public-key");
+}
+
+function updateSharedViewForEncryption(sharedPayload) {
+  const encryptionType = detectShareEncryptionType(sharedPayload?.encryptedContent, sharedPayload?.encryptionType);
+  const isSymmetric = encryptionType === "symmetric";
+  const isPublicKey = encryptionType === "public-key";
+
+  if (els.sharedNoteAccessKey) {
+    els.sharedNoteAccessKey.classList.toggle("hidden", !isSymmetric);
+    els.sharedNoteAccessKey.placeholder = isSymmetric ? "Enter the share password." : "Private key in this browser will be used.";
+  }
+  if (els.sharedNoteKey) {
+    els.sharedNoteKey.textContent = isSymmetric
+      ? "This note uses password-based AES-GCM sharing."
+      : "This note uses public-key sharing and decrypts with the receiver's private key.";
+  }
+}
+
+async function hydrateNote(note, overrideKey = "") {
+  if (!note) return note;
+  note.decryptedContent = "";
+
+  if (!note.decryptedContent && note.encryptedContent) {
+    note.decryptedContent = getNoteContent(note, overrideKey);
+  }
+
+  return note;
+}
+
+async function hydrateAllVisibleNotes(overrideKey = "") {
+  await Promise.all([
+    ...state.notes.map((note) => hydrateNote(note, overrideKey)),
+    ...state.trash.map((note) => hydrateNote(note, overrideKey)),
+  ]);
+}
+
+function getResolvedNoteTitle(note) {
+  return note?.title || getNoteTitle(note) || t().toasts.encryptedTitle;
+}
+
+function getResolvedNoteContent(note) {
+  return note?.decryptedContent || getNoteContent(note) || "";
 }
 
 function setSession(data, password) {
@@ -875,16 +1327,16 @@ function renderNotes() {
   const query = els.noteSearch.value.trim().toLowerCase();
   const lockedActionAttrs = state.notesUnlocked ? "" : ' disabled aria-disabled="true"';
   const visibleNotes = state.notes.filter((note) => {
-    const title = state.notesUnlocked && canDecryptNote(note) ? getNoteTitle(note) : t().toasts.encryptedTitle;
+    const title = state.notesUnlocked && getResolvedNoteContent(note) ? getResolvedNoteTitle(note) : t().toasts.encryptedTitle;
     return !query || title.toLowerCase().includes(query);
   });
   if (!visibleNotes.length) {
     els.notesList.innerHTML = `<article class="note-card"><p>${escapeHtml(copy.emptyNotes)}</p></article>`;
   } else {
     els.notesList.innerHTML = visibleNotes.map((note) => {
-      const isReadable = state.notesUnlocked && canDecryptNote(note);
-      const title = isReadable ? getNoteTitle(note) : t().toasts.encryptedTitle;
-      const preview = isReadable ? getNoteContent(note) : note.encryptedContent;
+      const isReadable = state.notesUnlocked && Boolean(getResolvedNoteContent(note));
+      const title = isReadable ? getResolvedNoteTitle(note) : t().toasts.encryptedTitle;
+      const preview = isReadable ? getResolvedNoteContent(note) : note.encryptedContent;
       return `<article class="note-card note-card-clickable" onclick="selectNote('${note.id}')"><span class="note-meta">${isReadable ? copy.unlockedBadge : copy.lockedBadge}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml((preview || note.encryptedContent || "").slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="event.stopPropagation(); selectNote('${note.id}')"${lockedActionAttrs}>${copy.openLabel}</button><button class="secondary-btn" type="button" onclick="event.stopPropagation(); deleteNote('${note.id}')"${lockedActionAttrs}>${copy.deleteLabel}</button></div></article>`;
     }).join("");
   }
@@ -893,9 +1345,9 @@ function renderNotes() {
     return;
   }
   els.trashList.innerHTML = state.trash.map((note) => {
-    const isReadable = state.notesUnlocked && canDecryptNote(note);
-    const title = isReadable ? getNoteTitle(note) : t().toasts.encryptedTitle;
-    const preview = isReadable ? getNoteContent(note) : note.encryptedContent || "";
+    const isReadable = state.notesUnlocked && Boolean(getResolvedNoteContent(note));
+    const title = isReadable ? getResolvedNoteTitle(note) : t().toasts.encryptedTitle;
+    const preview = isReadable ? getResolvedNoteContent(note) : note.encryptedContent || "";
     return `<article class="note-card"><span class="note-meta">${escapeHtml(isReadable ? copy.unlockedBadge : copy.lockedBadge)}</span><h4>${escapeHtml(title)}</h4><p>${escapeHtml(preview.slice(0, 140))}</p><div class="row"><button class="secondary-btn" type="button" onclick="restoreNote('${note.id}')"${lockedActionAttrs}>${copy.restoreLabel}</button><button class="secondary-btn" type="button" onclick="permanentlyDeleteNote('${note.id}')"${lockedActionAttrs}>${copy.permanentDeleteLabel}</button></div></article>`;
   }).join("");
 }
@@ -930,6 +1382,7 @@ async function refreshNotes() {
   if (!state.token) return;
   state.notes = await api("/notes");
   state.trash = await api("/notes?includeTrash=true");
+  await hydrateAllVisibleNotes();
   renderDashboardStats();
   renderNotes();
 }
@@ -944,35 +1397,39 @@ async function refreshSharedNotes() {
 function renderSharedLists() {
   if (!els.sharedWithMeList || !els.sharedByMeList) return;
 
+  const isVi = state.language === "vi";
+
+  // 1. DANH SÁCH NGƯỜI KHÁC CHIA SẺ CHO MÌNH
   if (!state.sharedWithMe.length) {
-    els.sharedWithMeList.innerHTML = `<article class="note-card"><p>${escapeHtml(state.language === "vi" ? "Chưa có nhật ký nào được chia sẻ cho bạn." : "No notes have been shared with you yet.")}</p></article>`;
+    els.sharedWithMeList.innerHTML = `<article class="note-card"><p>${escapeHtml(isVi ? "Chưa có nhật ký nào được chia sẻ cho bạn." : "No notes have been shared with you yet.")}</p></article>`;
   } else {
     els.sharedWithMeList.innerHTML = state.sharedWithMe.map((share) => `
       <article class="note-card">
-        <span class="note-meta">${escapeHtml(share.canEdit ? "Can edit" : "View only")}</span>
-        <h4>${escapeHtml(share.ownerName || "Owner")}</h4>
-        <p>${escapeHtml(share.canView ? "Mo note nay tu dashboard de nhap khoa va xem." : "Chu so huu dang tam tat quyen xem.")}</p>
+        <span class="note-meta">${escapeHtml(share.canEdit ? (isVi ? "Có quyền sửa" : "Can edit") : (isVi ? "Chỉ xem" : "View only"))}</span>
+        <h4>${escapeHtml(share.ownerName || (isVi ? "Chủ sở hữu" : "Owner"))}</h4>
+        <p>${escapeHtml(share.canView ? (isVi ? "Mở note này để xem chi tiết (Hỗ trợ giải mã tự động)." : "Open this note to view details (Auto-decryption supported).") : (isVi ? "Chủ sở hữu đang tạm tắt quyền xem." : "Owner has temporarily disabled view access."))}</p>
         <div class="row">
-          <button class="secondary-btn" type="button" onclick="openSharedDashboardNote('${share.id}')">Mở</button>
-          <button class="secondary-btn" type="button" onclick="removeSharedDashboardNote('${share.id}')">Ẩn</button>
+          <button class="secondary-btn" type="button" onclick="openSharedDashboardNote('${share.id}')">${isVi ? "Mở" : "Open"}</button>
+          <button class="secondary-btn" type="button" onclick="removeSharedDashboardNote('${share.id}')">${isVi ? "Ẩn" : "Hide"}</button>
         </div>
       </article>
     `).join("");
   }
 
+  // 2. DANH SÁCH MÌNH CHIA SẺ CHO NGƯỜI KHÁC
   if (!state.sharedByMe.length) {
-    els.sharedByMeList.innerHTML = `<article class="note-card"><p>${escapeHtml(state.language === "vi" ? "Bạn chưa chia sẻ nhật ký nào." : "You have not shared any notes yet.")}</p></article>`;
+    els.sharedByMeList.innerHTML = `<article class="note-card"><p>${escapeHtml(isVi ? "Bạn chưa chia sẻ nhật ký nào." : "You have not shared any notes yet.")}</p></article>`;
   } else {
     els.sharedByMeList.innerHTML = state.sharedByMe.map((share) => `
       <article class="note-card">
-        <span class="note-meta">${escapeHtml(share.accessMode === "edit" ? "Edit access" : "Public view")}</span>
-        <h4>${escapeHtml(share.recipientName || "Public link")}</h4>
-        <p>${escapeHtml(`View: ${share.canView ? "On" : "Off"} | Edit: ${share.canEdit ? "On" : "Off"}`)}</p>
+        <span class="note-meta">${escapeHtml(share.accessMode === "edit" ? (isVi ? "Quyền sửa" : "Edit access") : (isVi ? "Link công khai" : "Public view"))}</span>
+        <h4>${escapeHtml(share.recipientName || (isVi ? "Link công khai" : "Public link"))}</h4>
+        <p>${escapeHtml(isVi ? `Xem: ${share.canView ? "Bật" : "Tắt"} | Sửa: ${share.canEdit ? "Bật" : "Tắt"}` : `View: ${share.canView ? "On" : "Off"} | Edit: ${share.canEdit ? "On" : "Off"}`)}</p>
         <div class="row">
-          <button class="secondary-btn" type="button" onclick="openSharedDashboardNote('${share.id}')">Mở</button>
-          <button class="secondary-btn" type="button" onclick="toggleShareViewAccess('${share.id}', ${share.canView ? "false" : "true"})">${share.canView ? "Tắt xem" : "Bật xem"}</button>
-          ${share.accessMode === "edit" ? `<button class="secondary-btn" type="button" onclick="toggleShareEditAccess('${share.id}', ${share.canEdit ? "false" : "true"})">${share.canEdit ? "Khóa sửa" : "Cho sửa"}</button>` : ""}
-          <button class="secondary-btn" type="button" onclick="stopOwnedShare('${share.id}')">Ngừng chia sẻ</button>
+          <button class="secondary-btn" type="button" onclick="openSharedDashboardNote('${share.id}')">${isVi ? "Mở" : "Open"}</button>
+          <button class="secondary-btn" type="button" onclick="toggleShareViewAccess('${share.id}', ${share.canView ? "false" : "true"})">${share.canView ? (isVi ? "Tắt xem" : "Disable view") : (isVi ? "Bật xem" : "Enable view")}</button>
+          ${share.accessMode === "edit" ? `<button class="secondary-btn" type="button" onclick="toggleShareEditAccess('${share.id}', ${share.canEdit ? "false" : "true"})">${share.canEdit ? (isVi ? "Khóa sửa" : "Lock edit") : (isVi ? "Cho sửa" : "Allow edit")}</button>` : ""}
+          <button class="secondary-btn" type="button" onclick="stopOwnedShare('${share.id}')">${isVi ? "Ngừng chia sẻ" : "Stop sharing"}</button>
         </div>
       </article>
     `).join("");
@@ -983,10 +1440,10 @@ window.selectNote = function selectNote(noteId) {
   if (!ensureNotesUnlockedForAction()) return;
   const note = state.notes.find((item) => item.id === noteId);
   if (!note) return;
-  if (!canDecryptNote(note)) return showToast(t().toasts.invalidKey);
+  if (!getResolvedNoteContent(note)) return showToast(t().toasts.invalidKey);
   state.selectedNoteId = noteId;
-  els.noteTitle.value = getNoteTitle(note);
-  els.noteEditor.innerHTML = getNoteContent(note);
+  els.noteTitle.value = getResolvedNoteTitle(note);
+  els.noteEditor.innerHTML = getResolvedNoteContent(note);
   if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
   setEditorMode();
   openNoteModal();
@@ -1030,11 +1487,11 @@ async function saveNote() {
   const encryptionKey = getEncryptionKey();
   if (!title || !content) return showToast(t().toasts.needFields);
   if (!encryptionKey) return showToast(t().toasts.needKey);
-  if (state.selectedNoteId && !state.notesUnlocked) return showToast(t().toasts.needUnlock);
   try {
+    const encryptedContent = encryptText(content, encryptionKey);
     await api(state.selectedNoteId ? `/notes/${state.selectedNoteId}` : "/notes", {
       method: state.selectedNoteId ? "PUT" : "POST",
-      body: JSON.stringify({ title, content, encryptionKey }),
+      body: JSON.stringify({ title, encryptedContent }),
     });
     showToast(t().toasts.saved);
     resetNoteEditorForNewEntry();
@@ -1070,7 +1527,6 @@ function downloadCurrentNoteAsWord() {
 function initCalendarControls() {
   if (!els.calendarYearSelect || !els.calendarMonthSelect || !els.calendarSelectMonth) return;
 
-  // Populate year select in modal
   const currentYear = new Date().getFullYear();
   for (let year = currentYear - 5; year <= currentYear + 5; year += 1) {
     const option = document.createElement("option");
@@ -1079,14 +1535,10 @@ function initCalendarControls() {
     els.calendarYearSelect.appendChild(option);
   }
 
-  // Month select is already populated in HTML
-
-  // Set current values
   const viewDate = new Date(state.calendarViewDate);
   els.calendarYearSelect.value = String(viewDate.getFullYear());
   els.calendarMonthSelect.value = String(viewDate.getMonth());
 
-  // Event listeners
   on(els.calendarSelectMonth, "click", () => {
     if (els.calendarControlsModal) {
       els.calendarControlsModal.classList.remove("hidden");
@@ -1124,34 +1576,63 @@ function initCalendarControls() {
   });
 }
 
-
+// BẬT MODAL CHIA SẺ
 async function shareSelectedNote() {
   if (!state.selectedNoteId) return showToast(t().toasts.noNoteToShare);
   if (!state.notesUnlocked) return showToast(t().toasts.needUnlock);
+
+  if (els.shareEncryptionType) els.shareEncryptionType.value = "symmetric";
   if (els.shareTestKey) els.shareTestKey.value = "";
+  if (els.shareRecipientInput) els.shareRecipientInput.value = "";
+  updateShareModalFields();
+  if (els.shareRecipient) els.shareRecipient.value = "";
+
   openModal(els.shareKeyModal);
 }
 
 async function confirmShareSelectedNote() {
-  const sharedTestKey = els.shareTestKey?.value.trim() || "";
-  if (!sharedTestKey) return showToast(t().toasts.needShareKey);
+  const encryptionType = els.shareEncryptionType?.value || "symmetric";
+  const recipientIdentifier = els.shareRecipientInput?.value.trim() || "";
+  const sharePassword = els.shareTestKey?.value.trim() || "";
   const accessMode = els.shareAccessMode?.value || "view";
-  const recipientIdentifier = els.shareRecipient?.value.trim() || "";
-  if (accessMode === "edit" && !recipientIdentifier) return showToast(t().toasts.needRecipient);
+
   try {
     const note = state.notes.find((item) => item.id === state.selectedNoteId);
     if (!note) return showToast(t().toasts.noNoteToShare);
+
+    const originalTitle = getResolvedNoteTitle(note);
+    const originalContent = getResolvedNoteContent(note);
+    let encryptedContent = "";
+
+    if (encryptionType === "symmetric") {
+      if (!sharePassword) return showToast("Please enter a password for symmetric sharing.");
+      encryptedContent = await window.NikkiSecurity.encryptContentWithPassword(originalContent, sharePassword);
+    } else {
+      if (!recipientIdentifier) return showToast(t().toasts.needRecipient);
+      const publicKey = await getRecipientPublicKey(recipientIdentifier);
+      encryptedContent = await window.NikkiSecurity.encryptContentWithPublicKey(originalContent, publicKey);
+    }
+
     const data = await api(`/notes/${state.selectedNoteId}/share`, {
       method: "POST",
-      body: JSON.stringify({ sharedTitle: getNoteTitle(note), sharedContent: getNoteContent(note), sharedTestKey, accessMode, recipientIdentifier }),
+      body: JSON.stringify({
+        title: originalTitle,
+        encryptedContent,
+        encryptionType,
+        accessMode,
+        recipientIdentifier: encryptionType === "public-key" ? recipientIdentifier : "",
+      }),
     });
+
     if (els.shareLinkOutput) els.shareLinkOutput.value = data.shareLink;
     if (els.shareLinkPanel) els.shareLinkPanel.classList.remove("hidden");
     closeModal(els.shareKeyModal);
     await navigator.clipboard.writeText(data.shareLink);
     showToast(t().toasts.shareCreated);
     await refreshSharedNotes();
-  } catch (error) { showToast(error.message); }
+  } catch (error) {
+    showToast(error.message);
+  }
 }
 
 async function loadProfile() {
@@ -1167,6 +1648,8 @@ async function loadProfile() {
   els.profileEmail.value = user.email || "";
   els.profileGender.value = user.gender || "";
   if (els.userDropdownTrigger) els.userDropdownTrigger.textContent = user.displayName || user.username || "User";
+  await ensureUserKeyPair();
+  updateSecurityKeyUI();
 }
 
 async function saveProfile() {
@@ -1245,29 +1728,36 @@ function confirmUnlockNotes() {
   const key = els.notesUnlockKey?.value.trim() || "";
   if (!key) return showToast(t().toasts.needKey);
   if (!hasValidPersonalKey(key)) return showToast(t().toasts.invalidKey);
-  const hasReadableNotes = !state.notes.length && !state.trash.length
-    ? true
-    : [...state.notes, ...state.trash].some((note) => canDecryptNote(note, key));
-  if (!hasReadableNotes) return showToast(t().toasts.invalidKey);
-  state.personalKey = key;
-  state.notesUnlocked = true;
-  sessionStorage.setItem("personalKey", key);
-  closeModal(els.notesUnlockModal);
-  renderDashboardStats();
-  updateUnlockStateUI();
-  renderNotes();
-  if (state.selectedNoteId) {
-    const selectedNote = state.notes.find((note) => note.id === state.selectedNoteId);
-    if (!selectedNote || !canDecryptNote(selectedNote)) {
-      resetNoteEditorForNewEntry();
-    } else {
-      els.noteTitle.value = getNoteTitle(selectedNote, key);
-      els.noteEditor.innerHTML = getNoteContent(selectedNote, key);
-      if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
-      setEditorMode();
-    }
-  }
-  showToast(t().toasts.unlockSuccess);
+
+  hydrateAllVisibleNotes(key)
+    .then(() => {
+      const hasReadableNotes = !state.notes.length && !state.trash.length
+        ? true
+        : [...state.notes, ...state.trash].some((note) => Boolean(getResolvedNoteContent(note)));
+      if (!hasReadableNotes) {
+        return showToast(t().toasts.invalidKey);
+      }
+      state.personalKey = key;
+      sessionStorage.setItem("personalKey", key);
+      state.notesUnlocked = true;
+      closeModal(els.notesUnlockModal);
+      renderDashboardStats();
+      updateUnlockStateUI();
+      renderNotes();
+      if (state.selectedNoteId) {
+        const selectedNote = state.notes.find((note) => note.id === state.selectedNoteId);
+        if (!selectedNote || !getResolvedNoteContent(selectedNote)) {
+          resetNoteEditorForNewEntry();
+        } else {
+          els.noteTitle.value = getResolvedNoteTitle(selectedNote);
+          els.noteEditor.innerHTML = getResolvedNoteContent(selectedNote);
+          if (els.shareLinkPanel) els.shareLinkPanel.classList.add("hidden");
+          setEditorMode();
+        }
+      }
+      showToast(t().toasts.unlockSuccess);
+    })
+    .catch((error) => showToast(error.message || t().toasts.invalidKey));
 }
 
 async function requestProfileAccessOtp() {
@@ -1479,40 +1969,64 @@ async function loadSharedNote() {
       if (sidebar) sidebar.classList.add("hidden");
       if (userMenu) userMenu.classList.add("hidden");
       switchScreen("share-view");
-      els.sharedNoteTitle.textContent = t().toasts.encryptedTitle;
-      els.sharedNoteKey.textContent = t().toasts.shareInfo;
-      els.sharedNoteAccessKey.value = "";
-      if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.value = t().toasts.encryptedTitle;
-      els.sharedNoteContent.value = data.encryptedContent;
+      els.sharedNoteTitle.textContent = data.title || t().toasts.encryptedTitle;
+      updateSharedViewForEncryption(data);
+      if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.value = data.title || "";
+      if (els.sharedNoteEditor) els.sharedNoteEditor.innerHTML = data.encryptedContent || "";
       if (els.sharedNoteSave) els.sharedNoteSave.classList.add("hidden");
+
+      if (detectShareEncryptionType(data.encryptedContent, data.encryptionType) === "public-key") {
+        const content = await decryptSharedPayload(data);
+        if (content && els.sharedNoteEditor) {
+          els.sharedNoteEditor.innerHTML = content;
+          const canEdit = Boolean(data.canEdit && (data.isOwner || data.isRecipient));
+          els.sharedNoteEditor.contentEditable = canEdit;
+          if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.readOnly = !canEdit;
+          if (els.sharedToolbar) els.sharedToolbar.classList.toggle("hidden", !canEdit);
+          if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", !canEdit);
+          if (els.sharedNoteUnlock) els.sharedNoteUnlock.classList.add("hidden");
+        }
+      }
   } catch (error) {
     showToast(error.message || t().toasts.sharedLoadError);
   }
   return true;
 }
 
-async function openSharedNoteForDashboard(shareId) {
-  const data = await api(`/notes/shares/${shareId}`);
-  state.sharedPayload = data;
-  state.selectedSharedNoteId = shareId;
-  switchScreen("share-view");
-  els.sharedNoteTitle.textContent = data.canView ? (data.recipientName || data.ownerName || "Shared note") : t().toasts.encryptedTitle;
-  els.sharedNoteKey.textContent = data.canView ? (data.canEdit ? "Nhap khoa de mo va co the chinh sua." : "Nhap khoa de xem noi dung duoc chia se.") : "Chu so huu dang tat quyen xem.";
-  els.sharedNoteAccessKey.value = "";
-  if (els.sharedNoteTitleInput) {
-    els.sharedNoteTitleInput.value = data.canView ? "" : t().toasts.encryptedTitle;
-    els.sharedNoteTitleInput.readOnly = true;
-  }
-  if (els.sharedNoteEditor) {
-    els.sharedNoteEditor.innerHTML = data.encryptedContent || "";
-    els.sharedNoteEditor.contentEditable = false;
-  }
-  if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", true);
-}
-
 window.openSharedDashboardNote = async function openSharedDashboardNote(shareId) {
   try {
-    await openSharedNoteForDashboard(shareId);
+    const data = await api(`/notes/shares/${shareId}`);
+    state.sharedPayload = data;
+    state.selectedSharedNoteId = shareId;
+    switchScreen("share-view");
+
+    els.sharedNoteTitle.textContent = data.title || "Shared note";
+    updateSharedViewForEncryption(data);
+    if (els.sharedNoteUnlock) els.sharedNoteUnlock.classList.remove("hidden");
+
+    if (els.sharedNoteTitleInput) {
+      els.sharedNoteTitleInput.value = data.title || "";
+      els.sharedNoteTitleInput.readOnly = !data.canEdit;
+    }
+    if (els.sharedNoteEditor) {
+      els.sharedNoteEditor.innerHTML = data.encryptedContent || "";
+      els.sharedNoteEditor.contentEditable = false;
+    }
+    if (els.sharedToolbar) els.sharedToolbar.classList.add("hidden");
+    if (els.sharedNoteSave) els.sharedNoteSave.classList.add("hidden");
+
+    if (detectShareEncryptionType(data.encryptedContent, data.encryptionType) === "public-key") {
+      const content = await decryptSharedPayload(data);
+      if (content && els.sharedNoteEditor) {
+        els.sharedNoteEditor.innerHTML = content;
+        const canEdit = Boolean(data.canEdit && (data.isOwner || data.isRecipient));
+        els.sharedNoteEditor.contentEditable = canEdit;
+        if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.readOnly = !canEdit;
+        if (els.sharedToolbar) els.sharedToolbar.classList.toggle("hidden", !canEdit);
+        if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", !canEdit);
+        if (els.sharedNoteUnlock) els.sharedNoteUnlock.classList.add("hidden");
+      }
+    }
   } catch (error) { showToast(error.message); }
 };
 
@@ -1561,19 +2075,22 @@ function initCommonEvents() {
     state.language = state.language === "vi" ? "en" : "vi";
     renderMarketingContent();
     renderNotes();
+    renderSharedLists();   // <-- Ép dịch ngay danh sách chia sẻ
+    renderCalendarWidget(); // <-- Ép dịch luôn cả Lịch
   });
 }
 
 function initHomePage() {
   renderMarketingContent();
+  initHomeShowcase();
   els.navButtons.forEach((button) => on(button, "click", () => {
     const target = byId(button.dataset.section);
     if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
   }));
   on(els.brandHome, "click", () => goToHome("home"));
-  on(els.navLogin, "click", () => goToLogin(true));
+  on(els.navLogin, "click", () => goToLogin());
   on(els.heroAbout, "click", () => byId("about")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  on(els.heroLogin, "click", () => goToLogin(true));
+  on(els.heroLogin, "click", () => goToLogin());
   const section = byId(window.location.hash.replace("#", ""));
   if (section) requestAnimationFrame(() => section.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
@@ -1596,14 +2113,17 @@ function initLoginPage() {
     els.loginPassword.setAttribute("type", currentType === "password" ? "text" : "password");
     els.togglePassword.textContent = currentType === "password" ? copy.toggleHide : copy.toggleShow;
   });
+  
   on(els.loginSubmit, "click", async () => {
     try {
       const data = await api("/auth/login", { method: "POST", body: JSON.stringify({ identifier: els.loginIdentifier.value.trim(), password: els.loginPassword.value }) });
       setSession(data, els.loginPassword.value);
       showToast(t().toasts.loginSuccess);
+      await ensureUserKeyPair();
       goToDashboard();
     } catch (error) { showToast(error.message); }
   });
+  
   on(els.forgotPassword, "click", async () => {
     const email = window.prompt(t().toasts.forgotPrompt, els.loginIdentifier.value.trim());
     if (!email) return;
@@ -1617,8 +2137,10 @@ function initLoginPage() {
       showToast(data.message || t().toasts.forgotOtpSent);
     } catch (error) { showToast(error.message); }
   });
+  
   on(els.registerSubmit, "click", async () => {
     try {
+      await window.NikkiSecurity?.createPendingRegistrationKeyPair(els.registerEmail.value.trim());
       const data = await api("/auth/register", { method: "POST", body: JSON.stringify({ username: els.registerUsername.value.trim(), email: els.registerEmail.value.trim(), password: els.registerPassword.value }) });
       state.authFlow = "register";
       state.pendingId = data.pendingId;
@@ -1628,6 +2150,7 @@ function initLoginPage() {
       showToast(t().toasts.registerOtp);
     } catch (error) { showToast(error.message); }
   });
+  
   on(els.otpResend, "click", async () => {
     if (state.authFlow !== "register" || !state.pendingId) return;
     try {
@@ -1635,6 +2158,7 @@ function initLoginPage() {
       showToast(t().toasts.resendOtp);
     } catch (error) { showToast(error.message); }
   });
+  
   on(els.otpSubmit, "click", async () => {
     try {
       const otp = els.otpCode.value.trim();
@@ -1666,45 +2190,109 @@ function initDashboardPage() {
   loadCalendarNotes();
   renderCalendarWidget();
   initCalendarControls();
+// --- CHỨC NĂNG SÁNG / TỐI (THEME) ---
+  const themeToggle = byId("theme-toggle");
+  if (themeToggle) {
+    const sunIcon = document.querySelector(".sun-icon");
+    const moonIcon = document.querySelector(".moon-icon");
+
+    // Khôi phục trạng thái Sáng/Tối nếu người dùng đã lưu từ trước
+    const currentTheme = localStorage.getItem("diaryTheme") || "light";
+    if (currentTheme === "dark") {
+      document.body.classList.add("dark-theme");
+      if (sunIcon) sunIcon.classList.add("hidden");
+      if (moonIcon) moonIcon.classList.remove("hidden");
+    }
+
+    // Xử lý khi bấm nút Đổi Theme
+    on(themeToggle, "click", () => {
+      document.body.classList.toggle("dark-theme");
+      const isDark = document.body.classList.contains("dark-theme");
+      
+      // Lưu trạng thái vào máy
+      localStorage.setItem("diaryTheme", isDark ? "dark" : "light");
+      
+      // Đổi icon Mặt trời / Mặt trăng
+      if (sunIcon) sunIcon.classList.toggle("hidden", isDark);
+      if (moonIcon) moonIcon.classList.toggle("hidden", !isDark);
+    });
+  }
+  // NÚT BẤM CỦA KHUNG VIÊN THUỐC MENU / HOME
+  on(byId("dashboard-menu-toggle"), "click", () => {
+    const dashboard = document.querySelector(".dashboard");
+    if (dashboard) {
+      dashboard.classList.toggle("sidebar-closed");
+    }
+  });
+  // Nút Ngôi Nhà: Nhảy về màn hình Tổng quan Dashboard
+  on(byId("dashboard-home-btn"), "click", () => {
+    switchScreen("dashboard-home");
+  });
+
   document.querySelectorAll(".welcome-actions [data-screen]").forEach((button) => on(button, "click", async () => {
     switchScreen(button.dataset.screen);
     if (button.dataset.screen === "profile") await loadProfile();
     if (button.dataset.screen === "notes" && !state.selectedNoteId) resetNoteEditorForNewEntry();
   }));
   on(els.shareAccessMode, "change", () => {
-    if (els.shareRecipientField) els.shareRecipientField.classList.toggle("hidden", els.shareAccessMode.value !== "edit");
+    if (els.shareRecipientField) els.shareRecipientField.classList.remove("hidden");
   });
-  on(els.sharedNoteUnlock, "click", () => {
-    const key = els.sharedNoteAccessKey.value.trim();
-    if (!key || !state.sharedPayload) return;
-    if (state.sharedPayload.canView === false) return showToast(t().toasts.invalidKey);
-    const title = decryptText(state.sharedPayload.encryptedTitle, key);
-    const content = decryptText(state.sharedPayload.encryptedContent, key);
-    if (!title || !content) return showToast(t().toasts.sharedUnlockFailed);
-    els.sharedNoteTitle.textContent = title;
-    if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.value = title;
+  on(els.shareEncryptionType, "change", updateShareModalFields);
+  
+  on(els.sharedNoteUnlock, "click", async () => {
+    if (!state.sharedPayload || state.sharedPayload.canView === false) return showToast(t().toasts.invalidKey);
+    const encryptionType = detectShareEncryptionType(state.sharedPayload.encryptedContent, state.sharedPayload.encryptionType);
+    const password = encryptionType === "symmetric" ? (els.sharedNoteAccessKey?.value.trim() || "") : "";
+    const content = await decryptSharedPayload(state.sharedPayload, password);
+    if (!content) return showToast(t().toasts.sharedUnlockFailed);
+
+    const canEdit = Boolean(state.sharedPayload.canEdit && (state.sharedPayload.isOwner || state.sharedPayload.isRecipient));
+    els.sharedNoteTitle.textContent = state.sharedPayload.title || "Shared note";
+    if (els.sharedNoteTitleInput) {
+      els.sharedNoteTitleInput.value = state.sharedPayload.title || "";
+      els.sharedNoteTitleInput.readOnly = !canEdit;
+    }
     if (els.sharedNoteEditor) {
       els.sharedNoteEditor.innerHTML = content;
       els.sharedNoteEditor.contentEditable = canEdit;
     }
-    const canEdit = Boolean(state.sharedPayload.canEdit && (state.sharedPayload.isOwner || state.sharedPayload.isRecipient));
-    if (els.sharedNoteTitleInput) els.sharedNoteTitleInput.readOnly = !canEdit;
+    if (encryptionType === "symmetric") {
+      state.sharedPayload.sharedPassword = password;
+    }
     if (els.sharedToolbar) els.sharedToolbar.classList.toggle("hidden", !canEdit);
     if (els.sharedNoteSave) els.sharedNoteSave.classList.toggle("hidden", !canEdit);
     showToast(t().toasts.sharedUnlockSuccess);
   });
+  
   on(els.sharedNoteSave, "click", async () => {
     try {
-      if (!state.selectedSharedNoteId) return;
-      const sharedTestKey = els.sharedNoteAccessKey.value.trim();
+      if (!state.selectedSharedNoteId || !state.sharedPayload) return;
+      const encryptionType = detectShareEncryptionType(state.sharedPayload.encryptedContent, state.sharedPayload.encryptionType);
+      let encryptedContent = "";
+
+      if (encryptionType === "public-key") {
+        if (!state.sharedPayload.recipientId) return;
+        const recipientPublicKey = await getRecipientPublicKey(state.sharedPayload.recipientId);
+        encryptedContent = await window.NikkiSecurity.encryptContentWithPublicKey(els.sharedNoteEditor.innerHTML.trim(), recipientPublicKey);
+      } else {
+        const password = state.sharedPayload.sharedPassword || els.sharedNoteAccessKey?.value.trim() || "";
+        if (!password) return showToast("Share password is required to save this note.");
+        encryptedContent = await window.NikkiSecurity.encryptContentWithPassword(els.sharedNoteEditor.innerHTML.trim(), password);
+      }
+
       await api(`/notes/shares/${state.selectedSharedNoteId}`, {
         method: "PUT",
-        body: JSON.stringify({ title: els.sharedNoteTitleInput.value.trim(), content: els.sharedNoteEditor.innerHTML.trim(), sharedTestKey }),
+        body: JSON.stringify({
+          title: els.sharedNoteTitleInput.value.trim(),
+          encryptedContent,
+          encryptionType,
+        }),
       });
       showToast(t().toasts.shareSaved);
       await refreshSharedNotes();
     } catch (error) { showToast(error.message); }
   });
+  
   loadSharedNote().then((shared) => {
     if (shared) return;
     if (!state.token || !state.user || !state.hasAuthenticatedInSession) return goToHome();
@@ -1714,11 +2302,13 @@ function initDashboardPage() {
     refreshSharedNotes();
     loadProfile();
   });
+  
   els.sideButtons.forEach((button) => on(button, "click", async () => {
     switchScreen(button.dataset.screen);
     if (button.dataset.screen === "profile") await loadProfile();
     if (button.dataset.screen === "notes" && !state.selectedNoteId) resetNoteEditorForNewEntry();
   }));
+  
   on(els.userDropdownTrigger, "click", () => els.userDropdown && els.userDropdown.classList.toggle("hidden"));
   els.dropdownActions.forEach((button) => on(button, "click", async () => {
     const action = button.dataset.profileAction;
@@ -1727,10 +2317,12 @@ function initDashboardPage() {
     if (action === "switch") { clearSession(); showToast(t().toasts.switchAccount); return goToLogin(); }
     if (action === "logout") { clearSession(); showToast(t().toasts.logout); return goToHome(); }
   }));
+  
   document.querySelectorAll(".editor-toolbar:not(.shared-toolbar) button[data-command]").forEach((button) => on(button, "click", () => {
     if (!ensureNotesUnlockedForAction()) return;
     formatEditor(button.dataset.command, button.dataset.value);
   }));
+  
   on(els.fontSizeSelect, "change", () => {
     const value = els.fontSizeSelect.value;
     if (!value) return;
@@ -1738,23 +2330,27 @@ function initDashboardPage() {
     formatEditor("fontSize", value);
     els.fontSizeSelect.value = "";
   });
+  
   on(els.fontFamilySelect, "change", () => {
     if (!els.fontFamilySelect.value) return;
     if (!ensureNotesUnlockedForAction()) return;
     formatEditor("fontName", els.fontFamilySelect.value);
   });
+  
   on(els.fontColorInput, "change", () => {
     if (!els.fontColorInput.value) return;
     if (!ensureNotesUnlockedForAction()) return;
     formatEditor("foreColor", els.fontColorInput.value);
   });
+  
   on(els.highlightColorInput, "change", () => {
     if (!els.highlightColorInput.value) return;
     if (!ensureNotesUnlockedForAction()) return;
     formatEditor("hiliteColor", els.highlightColorInput.value);
   });
+  
   on(els.clearFormat, "click", () => formatEditor("removeFormat"));
-  // Shared toolbar events
+  
   if (els.sharedToolbar) {
     els.sharedToolbar.querySelectorAll("button[data-command]").forEach((button) => on(button, "click", () => formatEditor(button.dataset.command, button.dataset.value, els.sharedNoteEditor)));
     on(els.sharedFontSizeSelect, "change", () => formatEditor("fontSize", els.sharedFontSizeSelect.value, els.sharedNoteEditor));
@@ -1763,6 +2359,7 @@ function initDashboardPage() {
     on(els.sharedHighlightColor, "input", () => formatEditor("hiliteColor", els.sharedHighlightColor.value, els.sharedNoteEditor));
     on(els.sharedClearFormat, "click", () => formatEditor("removeFormat", null, els.sharedNoteEditor));
   }
+  
   on(els.downloadWord, "click", downloadCurrentNoteAsWord);
   on(els.noteSearch, "input", renderNotes);
   on(els.unlockNotes, "click", () => {
@@ -1779,6 +2376,7 @@ function initDashboardPage() {
     }
     openUnlockNotesModal();
   });
+  
   on(els.saveNote, "click", saveNote);
   on(els.shareNote, "click", shareSelectedNote);
   on(els.fab, "click", () => {
@@ -1788,6 +2386,32 @@ function initDashboardPage() {
   });
   on(els.saveProfile, "click", saveProfile);
   on(els.openSecurityPanel, "click", () => openModal(els.securityModal));
+  on(els.showPrivateKey, "click", () => {
+    state.rsaPrivateKeyVisible = !state.rsaPrivateKeyVisible;
+    updateSecurityKeyUI();
+  });
+  on(els.copyPrivateKey, "click", async () => {
+    const privateKey = getStoredPrivateKey();
+    if (!privateKey) return showToast("No private key is stored in this browser.");
+    await window.NikkiSecurity.copyText(privateKey);
+    showToast("Private key copied.");
+  });
+  on(els.downloadPrivateKey, "click", () => {
+    const privateKey = getStoredPrivateKey();
+    if (!privateKey || !state.user) return showToast("No private key is stored in this browser.");
+    window.NikkiSecurity.downloadTextFile(`nikki-private-key-${state.user.username || state.user.uid}.pem`, privateKey);
+    showToast("Private key downloaded.");
+  });
+  on(els.regenerateKeyPair, "click", async () => {
+    try {
+      await ensureUserKeyPair(true);
+      state.notesUnlocked = false;
+      renderDashboardStats();
+      updateUnlockStateUI();
+      updateSecurityKeyUI();
+      showToast("RSA key pair regenerated.");
+    } catch (error) { showToast(error.message); }
+  });
   on(els.securityOptionPassword, "click", () => openSecurityStepModal(els.securityPasswordModal));
   on(els.securityOptionKey, "click", () => openSecurityStepModal(els.personalKeyModal));
   on(els.securityOptionDelete, "click", () => openSecurityStepModal(els.deleteAccountModal));
@@ -1810,6 +2434,7 @@ function initDashboardPage() {
   on(els.recoverySubmit, "click", confirmRecoveryOtp);
   on(els.recoveryClose, "click", () => closeModal(els.recoveryModal));
   on(els.noteModalClose, "click", closeNoteModal);
+  
   on(els.profileAccessSubmit, "click", async () => {
     const key = els.profileAccessKey.value.trim();
     if (!key) return showToast(t().toasts.needProfileKey);
@@ -1821,11 +2446,13 @@ function initDashboardPage() {
     switchScreen("profile");
     await loadProfile();
   });
+  
   on(els.copyShareLink, "click", async () => {
     if (!els.shareLinkOutput.value) return;
     await navigator.clipboard.writeText(els.shareLinkOutput.value);
     showToast(t().toasts.shareCreated);
   });
+  
   on(els.calendarPrev, "click", () => {
     state.calendarViewDate = new Date(state.calendarViewDate.getFullYear(), state.calendarViewDate.getMonth() - 1, 1);
     renderCalendarWidget();
@@ -1853,6 +2480,7 @@ function initDashboardPage() {
   });
   on(els.notesUnlockConfirm, "click", confirmUnlockNotes);
   on(els.notesUnlockClose, "click", () => closeModal(els.notesUnlockModal));
+  
   on(els.shareKeyConfirm, "click", confirmShareSelectedNote);
   on(els.shareKeyClose, "click", () => closeModal(els.shareKeyModal));
 }
@@ -1861,3 +2489,6 @@ initCommonEvents();
 if (page === "home") initHomePage();
 if (page === "login") initLoginPage();
 if (page === "dashboard") initDashboardPage();
+
+
+

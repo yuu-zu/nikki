@@ -1413,6 +1413,35 @@ button:disabled {
   border-color: rgba(180, 83, 42, 0.18);
 }
 
+.rsa-security-card {
+  margin-top: 20px;
+}
+
+.security-key-textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  border-radius: 18px;
+  border: 1px solid rgba(192, 157, 120, 0.35);
+  background: var(--panel-strong);
+  color: var(--text);
+  padding: 14px 16px;
+  font: 500 12px/1.6 "Courier New", monospace;
+}
+
+.security-key-textarea-private {
+  filter: blur(6px);
+  transition: filter 0.2s ease;
+}
+
+.security-key-textarea-private.is-visible {
+  filter: none;
+}
+
+.security-key-actions {
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1180px) {
   .dashboard,
   .dashboard-home-layout {
@@ -1501,5 +1530,1025 @@ button:disabled {
 
   .home-splash-hero {
     min-height: calc(100vh - 210px);
+  }
+}
+/* --- TOPBAR BÊN TRONG DASHBOARD --- */
+.dashboard-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Khoảng cách giữa icon và chữ Home */
+}
+
+/* Nút icon 3 gạch */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06); /* Hiệu ứng xám nhẹ khi hover */
+}
+
+/* Nút chữ Home */
+.text-brand-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.text-brand-btn:hover {
+  color: var(--accent); /* Đổi màu khi hover */
+}
+/* --- KHUNG VIÊN THUỐC MENU + HOME --- */
+.dashboard-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Khoảng cách giữa viên thuốc và chữ Tiêu đề */
+}
+
+/* Khung bao ngoài */
+.nav-pill-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line, #e0e0e0); /* Viền nhạt */
+  border-radius: 24px; /* Bo tròn thành viên thuốc */
+  padding: 4px 8px;
+  background: var(--panel, #ffffff);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03); /* Đổ bóng cực nhẹ */
+}
+
+/* Vạch kẻ chia đôi 2 icon */
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--line, #e0e0e0);
+  margin: 0 4px;
+}
+
+/* Style cho 2 icon */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text, #333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--accent, #b4532a); /* Đổi màu khi di chuột */
+}
+
+.topbar-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+/* --- KHUNG NỔI MENU + HOME TẠI GÓC TRÁI MÀN HÌNH --- */
+.nav-pill-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line, #e0e0e0);
+  border-radius: 24px;
+  padding: 4px 8px;
+  background: var(--panel, #ffffff);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--line, #e0e0e0);
+  margin: 0 4px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--accent);
+}
+
+/* Đảm bảo khung nội dung không bị vướng nếu ở màn hình nhỏ */
+@media (max-width: 1080px) {
+  .floating-nav-pill {
+    left: 16px;
+    top: 16px;
+  }
+}
+/* --- XỬ LÝ GIAO DIỆN KHI ĐÓNG MENU SIDEBAR --- */
+
+/* Ép Dashboard về 1 cột Full màn hình */
+.dashboard.sidebar-closed {
+  grid-template-columns: 1fr !important;
+}
+
+/* Ẩn hẳn Sidebar đi */
+.dashboard.sidebar-closed .sidebar {
+  display: none !important;
+}
+/* --- BỐ CỤC THANH TOOLBAR --- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.dashboard-topbar-left, .dashboard-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Nút EN/VN dạng viên thuốc */
+.nav-pill-btn {
+  background: var(--panel, #ffffff);
+  border: 1px solid var(--line, #e0e0e0);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.nav-pill-btn:hover {
+  background: rgba(0,0,0,0.04);
+  color: var(--accent);
+}
+
+/* Fix hiển thị lỗi layout khi đóng Sidebar */
+.dashboard.sidebar-closed .dashboard-header {
+  padding-left: 0;
+  padding-top: 0;
+}
+
+/* =========================================
+   CHẾ ĐỘ TỐI (DARK MODE) - ÉP MÀU TUYỆT ĐỐI
+========================================= */
+
+/* 1. Ép đen nền tổng thể */
+body.dark-theme,
+body.dark-theme .main-shell,
+body.dark-theme .dashboard,
+body.dark-theme .parent-container,
+body.dark-theme .dashboard-content {
+  background: #1e1b18 !important;
+  background-color: #1e1b18 !important;
+  background-image: none !important; /* Xóa gradient trắng nếu có */
+  color: #f0ece6 !important;
+}
+
+/* 2. Ép đen cho tát cả các Thẻ (Card), Menu, Bảng biểu */
+body.dark-theme .panel-shell,
+body.dark-theme .welcome-card,
+body.dark-theme .summary-card,
+body.dark-theme .activity-card,
+body.dark-theme .status-card,
+body.dark-theme .quick-card,
+body.dark-theme .note-card,
+body.dark-theme .editor-card,
+body.dark-theme .calendar-card,
+body.dark-theme .modal-card,
+body.dark-theme .dropdown-menu,
+body.dark-theme .nav-pill-container,
+body.dark-theme .nav-pill-btn,
+body.dark-theme .shared-note-shell,
+body.dark-theme .shared-column {
+  background: #2a2522 !important;
+  background-color: #2a2522 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+/* 3. Ép trắng/xám cho Text, Tiêu đề */
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme strong,
+body.dark-theme label,
+body.dark-theme .text-brand-btn,
+body.dark-theme .user-badge {
+  color: #ffffff !important;
+}
+
+body.dark-theme p,
+body.dark-theme span,
+body.dark-theme .topbar-subtitle,
+body.dark-theme .sidebar-note,
+body.dark-theme .nav-pill-btn {
+  color: #a39c95 !important;
+}
+
+/* Fix mảng Highlight (Trạng thái khóa, Tổng số note) */
+body.dark-theme .summary-card strong,
+body.dark-theme .note-meta {
+  color: #d47045 !important;
+}
+
+/* 4. Ép màu cho Ô nhập liệu (Input, Editor) */
+body.dark-theme input, 
+body.dark-theme textarea, 
+body.dark-theme select,
+body.dark-theme .editor {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 5. Nút bấm phụ (Secondary) */
+body.dark-theme .secondary-btn,
+body.dark-theme .side-btn,
+body.dark-theme .text-btn {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #f0ece6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .secondary-btn:hover,
+body.dark-theme .side-btn:hover,
+body.dark-theme .text-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Nút Sidebar đang chọn */
+body.dark-theme .side-btn.active {
+  background-color: #d47045 !important;
+  color: #ffffff !important;
+  border-color: #d47045 !important;
+}
+
+/* 6. Nút Icon (Mặt trăng, Menu, Home) */
+body.dark-theme .icon-btn {
+  color: #f0ece6 !important;
+}
+
+body.dark-theme .icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #d47045 !important;
+}
+
+body.dark-theme .nav-divider {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+/* Ép thanh Toolbar (Header) mất nền trắng chói mắt */
+body.dark-theme .dashboard-header {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+/* --- FIX LỖI TÀNG HÌNH THANH MENU TRÁI (SIDEBAR) --- */
+body.dark-theme .sidebar {
+  background: #1e1b18 !important; /* Ép nền menu thành màu đen */
+  background-color: #1e1b18 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-theme .sidebar-logo {
+  color: #ffffff !important; /* Chữ BloomNote màu trắng */
+}
+
+body.dark-theme .side-btn {
+  background: transparent !important;
+  color: #a39c95 !important; /* Chữ menu màu xám sáng */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .side-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important; /* Sáng lên khi di chuột */
+}
+
+body.dark-theme .side-btn.active {
+  background: #d47045 !important; /* Mục đang chọn có nền cam */
+  color: #ffffff !important;
+}
+/* =========================================
+   FIX DỨT ĐIỂM SIDEBAR VÀ HEADER TRONG DARK MODE
+========================================= */
+body.dark-theme .sidebar {
+  background: #1e1b18 !important; /* Màu nền tối cho Sidebar */
+  background-color: #1e1b18 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .dashboard-header {
+  background: transparent !important; /* Loại bỏ nền trắng của Header */
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+}
+
+/* Ép màu cho các chữ trong Sidebar */
+body.dark-theme .sidebar-logo, 
+body.dark-theme .sidebar-group .side-btn {
+  color: #f0ece6 !important; /* Màu chữ trắng/xám sáng */
+}
+
+body.dark-theme .sidebar-note,
+body.dark-theme .sidebar-footer p {
+  color: #a39c95 !important; /* Màu chữ mô tả nhạt hơn */
+}
+
+/* Hiệu ứng cho nút trong Sidebar khi ở chế độ tối */
+body.dark-theme .side-btn {
+  background: transparent !important;
+  border: none !important;
+}
+
+body.dark-theme .side-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .side-btn.active {
+  background: var(--accent) !important; /* Giữ màu nhấn cho mục đang chọn */
+  color: #ffffff !important;
+}
+
+/* Ép màu cho Khung viên thuốc và Tiêu đề trên Header */
+body.dark-theme .nav-pill-container {
+  background: #2a2522 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .topbar-title {
+  color: #ffffff !important;
+}
+/* =========================================
+   FIX NỀN TRẮNG KHI TRÌNH DUYỆT AUTOFILL
+========================================= */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* Dùng box-shadow đổ bóng chìm màu tối đè kín cái nền trắng của trình duyệt */
+    -webkit-box-shadow: 0 0 0 50px #2a2522 inset !important; 
+    
+    /* Ép chữ bên trong thành màu trắng */
+    -webkit-text-fill-color: #ffffff !important; 
+    
+    /* Đổi màu con trỏ nhấp nháy thành trắng cho đồng bộ */
+    caret-color: #ffffff !important; 
+}
+/* =========================================
+   TRỊ DỨT ĐIỂM CÁC THẺ CON BỊ SÁNG TRONG DARK MODE
+========================================= */
+
+/* 1. Ép nền tối cho các Card nhỏ, List item, Footer, Toolbar... */
+body.dark-theme .summary-card,
+body.dark-theme .activity-item,
+body.dark-theme .sidebar-footer,
+body.dark-theme .calendar-day,
+body.dark-theme .calendar-note-panel,
+body.dark-theme .share-panel,
+body.dark-theme .security-section,
+body.dark-theme .security-option-card,
+body.dark-theme .editor-toolbar button,
+body.dark-theme .editor-toolbar select,
+body.dark-theme .editor-toolbar input[type="color"],
+body.dark-theme #user-dropdown {
+    background: #2a2522 !important; /* Đồng bộ nền xám đen */
+    background-color: #2a2522 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f0ece6 !important;
+}
+
+/* 2. Fix màu chữ bị chìm bên trong các ô Tổng quan & Nhịp làm việc */
+body.dark-theme .activity-item strong,
+body.dark-theme .summary-card strong,
+body.dark-theme .calendar-month-label {
+    color: #d47045 !important; /* Màu cam đất nổi bật */
+}
+
+body.dark-theme .activity-item span,
+body.dark-theme .summary-card span,
+body.dark-theme .dropdown-item {
+    color: #a39c95 !important; /* Xám dịu dễ đọc */
+}
+
+/* 3. Chỉnh màu khi hover chuột vào các mục tương tác */
+body.dark-theme .calendar-day:hover,
+body.dark-theme .security-option-card:hover,
+body.dark-theme .editor-toolbar button:hover,
+body.dark-theme .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 4. Fix ô nhập liệu bị khóa (Trạng thái chưa nhập Key) */
+body.dark-theme .editor.is-locked {
+    background: rgba(0, 0, 0, 0.25) !important;
+    color: #a39c95 !important;
+}
+
+/* 5. Fix Trạng thái Lịch (Ngày hôm nay, Ngày được chọn) */
+body.dark-theme .calendar-day.is-today {
+    border-color: #31594e !important;
+    color: #5ab598 !important;
+}
+body.dark-theme .calendar-day.is-selected {
+    background: rgba(180, 83, 42, 0.15) !important;
+    border-color: #d47045 !important;
+    color: #d47045 !important;
+}
+/* =========================================
+   CHIÊU CUỐI: ĐỔI BIẾN MÀU GỐC CHO TOÀN BỘ GIAO DIỆN
+========================================= */
+body.dark-theme {
+    /* Tự động đổi màu tất cả các Thẻ, Popup, Ô nhập liệu, Note... đang dùng màu gốc */
+    --bg: #1e1b18;
+    --panel: #2a2522;
+    --panel-strong: #2a2522;
+    --line: rgba(255, 255, 255, 0.15);
+    --text: #ffffff;
+    --muted: #a39c95;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Đảm bảo nền mờ phía sau popup cũng tối màu */
+body.dark-theme .modal-overlay {
+    background: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Xử lý riêng cho chữ Placeholder trong các ô nhập liệu của Popup */
+body.dark-theme .modal-card input::placeholder,
+body.dark-theme .modal-card select {
+    color: #a39c95 !important;
+}
+/* =========================================
+   FIX NỀN SÁNG CỦA CÁC THẺ GHI CHÚ (TRASH & NOTES)
+========================================= */
+body.dark-theme .note-card,
+body.dark-theme .shared-note-card {
+    background-color: #2a2522 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Đổi màu Tiêu đề ghi chú */
+body.dark-theme .note-card h3,
+body.dark-theme .shared-note-card h3 {
+    color: #ffffff !important;
+}
+
+/* Đổi màu Nội dung tóm tắt & Ngày tháng */
+body.dark-theme .note-card p,
+body.dark-theme .shared-note-card p,
+body.dark-theme .note-date {
+    color: #a39c95 !important;
+}
+
+/* Hiệu ứng sáng nhẹ khi di chuột vào thẻ */
+body.dark-theme .note-card:hover,
+body.dark-theme .shared-note-card:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+/* =========================================
+   FIX DỨT ĐIỂM NỀN TRẮNG CỦA THÙNG RÁC, HỒ SƠ & CHIA SẺ
+========================================= */
+body.dark-theme #trash,
+body.dark-theme #profile,
+body.dark-theme #share-view {
+    background: #2a2522 !important;
+    background-color: #2a2522 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+/* =========================================
+   ĐƯA TIÊU ĐỀ XUỐNG DƯỚI NÚT MENU + HOME
+========================================= */
+/* Ép cụm bên trái xếp theo chiều dọc */
+.dashboard-topbar-left {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important; /* Khoảng cách giữa nút Menu và Tiêu đề */
+}
+
+/* Kéo cụm bên phải (Nút EN/VN, DarkMode, User) lên căn bằng ngang với cụm Menu */
+.dashboard-header {
+    align-items: flex-start !important; 
+}
+
+/* Landing page refresh for NIKKI */
+body[data-page="home"] {
+  background:
+    linear-gradient(180deg, rgba(7, 11, 18, 0.78), rgba(7, 11, 18, 0.54)),
+    radial-gradient(circle at top left, rgba(52, 108, 92, 0.24), transparent 28%),
+    url("./images/pic2.jpg") center center / cover no-repeat fixed;
+}
+
+body[data-page="home"] #app {
+  padding-top: 96px;
+}
+
+.home-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  align-items: center;
+  padding: 18px 34px;
+}
+
+.home-brand-copy {
+  color: #fffaf4;
+}
+
+.home-brand-name {
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  letter-spacing: 0.14em;
+}
+
+.home-topbar .nav-btn,
+.home-topbar .lang-btn,
+.home-topbar .nav-login {
+  background: transparent;
+  border: none;
+  color: #fffaf4;
+  box-shadow: none;
+}
+
+.home-topbar .nav-btn.active,
+.home-topbar .nav-btn:hover,
+.home-topbar .nav-login:hover,
+.home-topbar .lang-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.home-splash-main {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 0;
+}
+
+.home-splash-hero,
+.features-stack,
+.home-about-section,
+.landing-footer {
+  width: 100%;
+}
+
+.home-splash-hero {
+  min-height: calc(100vh - 160px);
+  align-content: center;
+  justify-items: center;
+}
+
+.home-splash-title {
+  max-width: 8ch;
+}
+
+.features-stack {
+  display: grid;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.intro-band {
+  padding: 34px;
+  border-radius: 34px;
+  background:
+    linear-gradient(135deg, rgba(11, 17, 27, 0.94), rgba(23, 32, 47, 0.9)),
+    rgba(20, 24, 34, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.intro-band-copy {
+  width: min(900px, 100%);
+}
+
+.intro-band .section-kicker,
+.intro-band h2,
+.intro-band-text {
+  color: #f8f4ee;
+}
+
+.intro-band h2 {
+  margin: 0 0 18px;
+  font-size: clamp(32px, 5vw, 52px);
+  font-family: "Playfair Display", serif;
+}
+
+.intro-band-text {
+  margin: 0 0 14px;
+  line-height: 1.85;
+  color: rgba(248, 244, 238, 0.82);
+}
+
+.showcase-section,
+.landing-footer {
+  margin-top: 0;
+}
+
+.showcase-heading {
+  margin-bottom: 18px;
+}
+
+.section-summary {
+  max-width: 42ch;
+  margin: 0;
+  color: rgba(255, 250, 244, 0.82);
+  line-height: 1.75;
+}
+
+.showcase-slider {
+  padding: 22px;
+  border-radius: 34px;
+  background: rgba(255, 250, 244, 0.9);
+}
+
+.showcase-viewport {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.showcase-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.showcase-slide {
+  position: relative;
+  flex: 0 0 100%;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.showcase-image {
+  width: 100%;
+  height: 560px;
+  object-fit: cover;
+  display: block;
+  border-radius: 28px;
+  transform: scale(1.02);
+  transition: transform 0.7s ease;
+}
+
+.showcase-slide.active .showcase-image {
+  transform: scale(1);
+}
+
+.showcase-overlay {
+  position: absolute;
+  inset: auto 28px 28px 28px;
+  max-width: 420px;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(9, 14, 24, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  color: #fffaf4;
+}
+
+.showcase-overlay h3 {
+  margin: 0 0 10px;
+}
+
+.showcase-overlay p {
+  margin: 0;
+  color: rgba(255, 250, 244, 0.84);
+  line-height: 1.75;
+}
+
+.preview-label {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fffaf4;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.showcase-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding-top: 22px;
+}
+
+.carousel-arrow {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(35, 23, 15, 0.1);
+  background: #ffffff;
+  color: var(--text);
+  font-size: 22px;
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.carousel-arrow:hover {
+  transform: translateY(-1px);
+  background: var(--accent);
+  color: #fffaf4;
+}
+
+.showcase-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.showcase-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(49, 89, 78, 0.18);
+}
+
+.showcase-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 0 6px rgba(180, 83, 42, 0.12);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.team-card {
+  padding: 28px 18px;
+  border-radius: 28px;
+  text-align: center;
+  background: rgba(255, 250, 244, 0.9);
+}
+
+.team-avatar-image {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 4px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 34px rgba(32, 21, 15, 0.18);
+}
+
+.team-card h3 {
+  margin: 0;
+}
+
+.landing-footer {
+  width: 100vw;
+  margin-top: 72px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 88px 0 0;
+}
+
+.footer-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+  gap: 28px;
+  align-items: start;
+  min-height: 320px;
+  padding: 48px max(24px, calc((100vw - 1180px) / 2)) 96px;
+  border-radius: 0;
+  background: #06080d;
+  color: #f5f5f5;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.footer-brand-column,
+.footer-contact-column {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.footer-school-logo {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.footer-address-copy p,
+.footer-contact-column p {
+  margin: 0;
+  line-height: 1.8;
+  color: inherit;
+}
+
+.footer-contact-column {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-self: end;
+}
+
+.footer-contact-column span {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.footer-contact-column a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.footer-contact-column a:hover {
+  text-decoration: underline;
+}
+
+.footer-about-line {
+  margin-top: 10px !important;
+}
+
+.footer-about-text {
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.background-credit {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fffaf4;
+  text-decoration: none;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+
+.background-credit:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 18, 0.36);
+  backdrop-filter: blur(6px);
+}
+
+.loading-card {
+  min-width: 180px;
+  padding: 22px 24px;
+  border-radius: 22px;
+  background: rgba(12, 16, 24, 0.88);
+  color: #fffaf4;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.loading-spinner {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.home-splash-hero,
+.intro-band,
+.showcase-section,
+.about-panel,
+.team-card,
+.footer-block {
+  animation: fadeUp 0.7s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1080px) {
+  .team-grid,
+  .footer-block {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-contact-column {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 860px) {
+  body[data-page="home"] #app {
+    padding-top: 120px;
+  }
+
+  .home-topbar {
+    padding: 16px 20px;
+  }
+
+  .home-top-actions {
+    width: 100%;
+  }
+
+  .home-nav-links {
+    width: 100%;
+  }
+
+  .home-splash-main {
+    width: min(100% - 24px, 1180px);
+    padding-top: 20px;
+  }
+
+  .showcase-viewport,
+  .showcase-image {
+    min-height: 420px;
+    height: 420px;
+  }
+
+  .showcase-overlay,
+  .footer-brand-column {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-footer {
+    margin-top: 56px;
+    padding-top: 64px;
+  }
+
+  .footer-block {
+    padding: 40px 20px 72px;
   }
 }

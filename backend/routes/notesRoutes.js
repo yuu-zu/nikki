@@ -1,7 +1,5 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const { encryptDiaryContent } = require("../../services/encryptionService");
-const { hashPassword, verifyPassword } = require("../utils/passwords");
 const { isExpired } = require("../../utils/date");
 
 function createNotesRoutes({ db }) {
@@ -39,15 +37,18 @@ function createNotesRoutes({ db }) {
     return {
       id: doc.id,
       noteId: share.noteId,
+      senderId: share.senderId || share.ownerId || "",
       ownerId: share.ownerId,
       ownerName: share.ownerName || "",
+      receiverId: share.receiverId || share.recipientId || "",
       recipientId: share.recipientId || "",
       recipientName: share.recipientName || "",
+      encryptionType: share.encryptionType || "public-key",
       accessMode: share.accessMode || "view",
       canView: share.canView !== false,
       canEdit: Boolean(share.canEdit),
       recipientRemoved: Boolean(share.recipientRemoved),
-      encryptedTitle: share.encryptedTitle || "",
+      title: share.title || "",
       encryptedContent: share.encryptedContent || "",
       shareLink: share.shareLink || "",
       createdAt: share.createdAt || "",
@@ -93,9 +94,9 @@ function createNotesRoutes({ db }) {
 
   router.post("/", async (req, res) => {
     try {
-      const { title, content, encryptionKey } = req.body;
-      if (!title || !content || !encryptionKey) {
-        return res.status(400).json({ message: "Title, content, and encryption key are required." });
+      const { title, encryptedContent } = req.body;
+      if (!title || !encryptedContent) {
+        return res.status(400).json({ message: "Title and encrypted content are required." });
       }
 
       const id = uuidv4();
@@ -103,9 +104,8 @@ function createNotesRoutes({ db }) {
       const note = {
         id,
         ownerId: req.user.uid,
-        title: "",
-        encryptedTitle: encryptDiaryContent(title, encryptionKey),
-        encryptedContent: encryptDiaryContent(content, encryptionKey),
+        title,
+        encryptedContent,
         isDeleted: false,
         deletedAt: "",
         createdAt: now,
@@ -121,7 +121,7 @@ function createNotesRoutes({ db }) {
 
   router.put("/:id", async (req, res) => {
     try {
-      const { title, content, encryptionKey } = req.body;
+      const { title, encryptedContent, encryptionType } = req.body;
       const noteRef = db.collection("notes").doc(req.params.id);
       const doc = await noteRef.get();
 
@@ -132,13 +132,8 @@ function createNotesRoutes({ db }) {
       }
 
       const updates = { updatedAt: new Date().toISOString() };
-      if (title !== undefined && encryptionKey) {
-        updates.title = "";
-        updates.encryptedTitle = encryptDiaryContent(title, encryptionKey);
-      }
-      if (content !== undefined && encryptionKey) {
-        updates.encryptedContent = encryptDiaryContent(content, encryptionKey);
-      }
+      if (title !== undefined) updates.title = title;
+      if (encryptedContent !== undefined) updates.encryptedContent = encryptedContent;
 
       await noteRef.update(updates);
       const updatedDoc = await noteRef.get();
@@ -218,7 +213,8 @@ function createNotesRoutes({ db }) {
 
   router.post("/:id/share", async (req, res) => {
     try {
-      const { sharedTitle, sharedContent, sharedTestKey, accessMode = "view", recipientIdentifier = "" } = req.body;
+      // Nhận thêm trường encryptedAesKey (RSA)
+      const { title, encryptedContent, encryptionType = "public-key", accessMode = "view", recipientIdentifier = "" } = req.body;
       const noteRef = db.collection("notes").doc(req.params.id);
       const doc = await noteRef.get();
 
@@ -227,8 +223,11 @@ function createNotesRoutes({ db }) {
       if (note.ownerId !== req.user.uid) {
         return res.status(403).json({ message: "You do not have permission to share this note." });
       }
-      if (!sharedTitle || !sharedContent || !sharedTestKey) {
-        return res.status(400).json({ message: "Shared title, content, and test key are required." });
+      if (!title || !encryptedContent) {
+        return res.status(400).json({ message: "Shared title and encrypted content are required." });
+      }
+      if (!["symmetric", "public-key"].includes(encryptionType)) {
+        return res.status(400).json({ message: "Encryption type is invalid." });
       }
       if (!["view", "edit"].includes(accessMode)) {
         return res.status(400).json({ message: "Access mode is invalid." });
@@ -239,9 +238,9 @@ function createNotesRoutes({ db }) {
       let recipientId = "";
       let recipientName = "";
 
-      if (accessMode === "edit") {
+      if (encryptionType === "public-key") {
         if (!recipientIdentifier.trim()) {
-          return res.status(400).json({ message: "Recipient account is required for edit access." });
+          return res.status(400).json({ message: "Recipient account is required for public-key sharing." });
         }
 
         let recipientSnapshot = await db.collection("users").where("email", "==", recipientIdentifier.trim()).limit(1).get();
@@ -263,13 +262,15 @@ function createNotesRoutes({ db }) {
 
       await db.collection("noteShares").doc(shareToken).set({
         id: shareToken,
+        senderId: req.user.uid,
         ownerId: req.user.uid,
         ownerName: owner?.displayName || owner?.username || req.user.username || "",
         noteId,
         shareToken,
-        encryptedTitle: encryptDiaryContent(sharedTitle, sharedTestKey),
-        encryptedContent: encryptDiaryContent(sharedContent, sharedTestKey),
-        sharedKeyHash: await hashPassword(sharedTestKey),
+        receiverId: recipientId,
+        title,
+        encryptedContent,
+        encryptionType,
         accessMode,
         recipientId,
         recipientName,
@@ -340,7 +341,7 @@ function createNotesRoutes({ db }) {
 
   router.put("/shares/:shareId", async (req, res) => {
     try {
-      const { title, content, sharedTestKey } = req.body;
+      const { title, encryptedContent } = req.body;
       const shareRef = db.collection("noteShares").doc(req.params.shareId);
       const shareDoc = await shareRef.get();
 
@@ -357,18 +358,14 @@ function createNotesRoutes({ db }) {
       if (!share.canEdit) {
         return res.status(403).json({ message: "Edit access has been disabled by the owner." });
       }
-      if (!title || !content || !sharedTestKey) {
-        return res.status(400).json({ message: "Title, content, and shared key are required." });
-      }
-
-      const keyOk = await verifyPassword(sharedTestKey, share.sharedKeyHash);
-      if (!keyOk) {
-        return res.status(401).json({ message: "Shared key is incorrect." });
+      if (!title || !encryptedContent) {
+        return res.status(400).json({ message: "Title and encrypted content are required." });
       }
 
       await shareRef.update({
-        encryptedTitle: encryptDiaryContent(title, sharedTestKey),
-        encryptedContent: encryptDiaryContent(content, sharedTestKey),
+        title,
+        encryptedContent,
+        ...(encryptionType ? { encryptionType } : {}),
         updatedAt: new Date().toISOString(),
       });
 
@@ -490,12 +487,15 @@ function createSharedNotesRoutes({ db }) {
 
       return res.json({
         id: doc.id,
+        senderId: note.senderId || note.ownerId || "",
         ownerId: note.ownerId || "",
+        receiverId: note.receiverId || note.recipientId || "",
         recipientId: note.recipientId || "",
+        encryptionType: note.encryptionType || "public-key",
         accessMode: note.accessMode || "view",
         canView: note.canView !== false,
         canEdit: Boolean(note.canEdit),
-        encryptedTitle: note.encryptedTitle,
+        title: note.title || "",
         encryptedContent: note.encryptedContent,
         shareLink: note.shareLink || "",
         createdAt: note.createdAt || "",
@@ -513,3 +513,4 @@ module.exports = {
   createNotesRoutes,
   createSharedNotesRoutes,
 };
+
