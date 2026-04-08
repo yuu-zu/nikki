@@ -634,6 +634,9 @@ const els = {
   keyStatus: byId("key-status"),
   noteSearch: byId("note-search"),
   notesToolbarKey: byId("notes-toolbar-key"),
+  notesUnlockModal: byId("notes-unlock-modal"),
+  notesUnlockConfirm: byId("notes-unlock-confirm"),
+  notesUnlockClose: byId("notes-unlock-close"),
   unlockNotes: byId("unlock-notes"),
   notesSecurityHint: byId("notes-security-hint"),
   notesList: byId("notes-list"),
@@ -2150,13 +2153,14 @@ function openSecurityStepModal(element) {
 }
 
 function openUnlockNotesModal() {
-  const promptMessage = state.language === "vi"
-    ? "Nhập khóa nhật ký để mở khóa:"
-    : "Enter your personal key to unlock the diary:";
-  const defaultKey = state.personalKey || (isPersonalKeyLinkedToPassword() ? state.tempPassword : "");
-  const key = window.prompt(promptMessage, defaultKey);
-  if (key === null) return;
-  confirmUnlockNotes(key.trim());
+  if (els.notesToolbarKey) {
+    els.notesToolbarKey.value = state.personalKey || (isPersonalKeyLinkedToPassword() ? state.tempPassword : "");
+    els.notesToolbarKey.placeholder = state.language === "vi" ? "Nhập khóa nhật ký" : "Enter journal key";
+  }
+  openModal(els.notesUnlockModal);
+  if (els.notesToolbarKey) {
+    setTimeout(() => els.notesToolbarKey.focus(), 10);
+  }
 }
 
 function confirmUnlockNotes(key = "") {
@@ -2179,6 +2183,7 @@ function confirmUnlockNotes(key = "") {
       renderDashboardStats();
       updateUnlockStateUI();
       renderNotes();
+      closeModal(els.notesUnlockModal);
       if (state.selectedNoteId) {
         const selectedNote = state.notes.find((note) => note.id === state.selectedNoteId);
         if (!selectedNote || !getResolvedNoteContent(selectedNote)) {
@@ -2852,6 +2857,8 @@ function initDashboardPage() {
   bindColorPalette("#note-highlight-palette", "hiliteColor", "highlight-color-advanced-toggle", "highlight-color");
   
   on(els.clearFormat, "click", () => formatEditor("removeFormat"));
+  if (els.notesUnlockConfirm) on(els.notesUnlockConfirm, "click", () => confirmUnlockNotes());
+  if (els.notesUnlockClose) on(els.notesUnlockClose, "click", () => closeModal(els.notesUnlockModal));
   
   if (els.sharedToolbar) {
     els.sharedToolbar.querySelectorAll("button[data-command]").forEach((button) => on(button, "click", () => formatEditor(button.dataset.command, button.dataset.value, els.sharedNoteEditor)));
