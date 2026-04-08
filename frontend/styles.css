@@ -35,15 +35,25 @@ body {
 }
 
 body[data-page="home"] {
-  background:
+  background-color: #f6efe5;
+  background-image:
     linear-gradient(rgba(24, 15, 10, 0.26), rgba(24, 15, 10, 0.42)),
-    url("./images/pic2.jpg") center center / cover no-repeat fixed;
+    url("./images/pic2.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 body[data-page="login"] {
-  background:
+  background-color: #f6efe5;
+  background-image:
     linear-gradient(rgba(24, 15, 10, 0.34), rgba(24, 15, 10, 0.46)),
-    url("./images/pic2.jpg") center center / cover no-repeat fixed;
+    url("./images/pic2.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 body[data-page="login"] #app {
@@ -673,11 +683,19 @@ body[data-page="login"] .card h2 {
   color: var(--muted);
 }
 
+.field-error {
+  margin: 8px 0 0;
+  color: #c62828;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .field input,
 .field select,
 #shared-note-content,
 #shared-note-title-input,
 #note-search,
+#notes-toolbar-key,
 #note-title {
   width: 100%;
   border: 1px solid rgba(192, 157, 120, 0.35);
@@ -1001,6 +1019,11 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.toolbar #note-search,
+.toolbar #notes-toolbar-key {
+  flex: 1 1 220px;
 }
 
 .calendar-head {
@@ -1360,12 +1383,31 @@ button:disabled {
 }
 
 .modal-card {
+  position: relative;
   width: min(520px, 100%);
   padding: 28px;
   border-radius: 24px;
   background: var(--panel-strong);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background: rgba(180, 83, 42, 0.14);
+  color: var(--accent);
 }
 
 .modal-card-wide {
@@ -2090,10 +2132,15 @@ body.dark-theme #share-view {
 
 /* Landing page refresh for NIKKI */
 body[data-page="home"] {
-  background:
+  background-color: #f6efe5;
+  background-image:
     linear-gradient(180deg, rgba(7, 11, 18, 0.78), rgba(7, 11, 18, 0.54)),
     radial-gradient(circle at top left, rgba(52, 108, 92, 0.24), transparent 28%),
-    url("./images/pic2.jpg") center center / cover no-repeat fixed;
+    url("./images/pic2.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 body[data-page="home"] #app {
@@ -2724,7 +2771,9 @@ body {
 
 body[data-page="home"],
 body[data-page="login"] {
-  background-attachment: scroll;
+  background:
+    linear-gradient(rgba(24, 15, 10, 0.26), rgba(24, 15, 10, 0.42)),
+    url("./images/pic2.jpg") center center / cover no-repeat fixed;
   background-color: #1d1510;
 }
 
